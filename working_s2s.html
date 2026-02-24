@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Speech-to-Speech - Working Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        
+        .mic-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .mic-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            font-size: 80px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+            position: relative;
+            user-select: none;
+        }
+        
+        .mic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+        }
+        
+        .mic-btn.recording {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            animation: recordPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes recordPulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { box-shadow: 0 0 0 30px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+        
+        .status-display {
+            background: linear-gradient(135deg, #e3f2fd, #2563eb);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .conversation {
+            margin: 30px 0;
+        }
+        
+        .message {
+            background: #f8f9fa;
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .message.ai {
+            border-left-color: #2196F3;
+            background: #e3f2fd;
+            color: white;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .instructions h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #374151;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>🎤 Real-time Speech-to-Speech</h1>
+        
+        <div class="mic-section">
+            <button id="micBtn" class="mic-btn">🎙️</button>
+        </div>
+        
+        <div id="statusDisplay" class="status-display">
+            ✅ Ready - Press and hold microphone to speak
+        </div>
+        
+        <div class="conversation">
+            <div class="message">
+                <strong>You:</strong> <span id="userMessage">...</span>
+            </div>
+            <div class="message ai">
+                <strong>AI:</strong> <span id="aiMessage">...</span>
+            </div>
+        </div>
+        
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        
+        <div class="instructions">
+            <h3>📋 How to use:</h3>
+            <ol>
+                <li><strong>Press and hold</strong> the 🎙️ button</li>
+                <li><strong>Speak clearly</strong> into your microphone</li>
+                <li><strong>Release</strong> the button</li>
+                <li><strong>Listen</strong> for the AI voice response</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        
+        const micBtn = document.getElementById('micBtn');
+        const statusDisplay = document.getElementById('statusDisplay');
+        const userMessage = document.getElementById('userMessage');
+        const aiMessage = document.getElementById('aiMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Update status display
+        function updateStatus(text, isError = false) {
+            statusDisplay.textContent = text;
+            if (isError) {
+                statusDisplay.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            } else {
+                statusDisplay.style.background = 'linear-gradient(135deg, #e3f2fd, #2563eb)';
+            }
+        }
+        
+        // Show error
+        function showError(message) {
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Start recording
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 16000
+                    } 
+                });
+                
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm'
+                });
+                
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await processAudio(audioBlob);
+                };
+                
+                mediaRecorder.start(100); // Collect data every 100ms
+                isRecording = true;
+                micBtn.classList.add('recording');
+                updateStatus('🎤 Listening... Speak now');
+                errorMessage.style.display = 'none';
+                
+            } catch (err) {
+                showError('Microphone access denied: ' + err.message);
+                updateStatus('✅ Ready - Press and hold microphone to speak');
+            }
+        }
+        
+        // Stop recording
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                micBtn.classList.remove('recording');
+                updateStatus('🧠 Processing your speech...');
+            }
+        }
+        
+        // Process audio and get response
+        async function processAudio(audioBlob) {
+            try {
+                // Step 1: Transcribe audio
+                updateStatus('🧠 Transcribing your speech...');
+                
+                const formData = new FormData();
+                formData.append('audio_file', audioBlob, 'recording.webm');
+                
+                const sttResponse = await fetch('http://localhost:8000/api/stt/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!sttResponse.ok) {
+                    throw new Error('Speech recognition failed');
+                }
+                
+                const sttData = await sttResponse.json();
+                const userText = sttData.text || '';
+                
+                userMessage.textContent = userText || '(Could not understand - please speak clearly)';
+                
+                if (!userText || userText.trim().length < 2) {
+                    showError('Could not understand what you said. Please speak clearly and try again.');
+                    updateStatus('✅ Ready - Press and hold microphone to speak');
+                    return;
+                }
+                
+                // Step 2: Get AI response
+                updateStatus('🤖 Generating AI response...');
+                
+                const chatResponse = await fetch('http://localhost:8000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText })
+                });
+                
+                if (!chatResponse.ok) {
+                    throw new Error('AI response generation failed');
+                }
+                
+                const chatData = await chatResponse.json();
+                const aiText = chatData.response || '';
+                
+                aiMessage.textContent = aiText || '(No response received)';
+                
+                // Step 3: Convert to speech
+                if (aiText) {
+                    updateStatus('🔊 Generating voice response...');
+                    
+                    try {
+                        const ttsResponse = await fetch('http://localhost:8000/api/tts/synthesize-audio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                text: aiText,
+                                voice: 'en-US-GuyNeural'
+                            })
+                        });
+                        
+                        if (ttsResponse.ok) {
+                            const audioBlob = await ttsResponse.blob();
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            const audio = new Audio(audioUrl);
+                            
+                            audio.onended = () => {
+                                updateStatus('✅ Ready - Press and hold microphone to speak');
+                                URL.revokeObjectURL(audioUrl);
+                            };
+                            
+                            audio.onerror = () => {
+                                showError('Audio playback failed, but you can read the response above');
+                                updateStatus('✅ Ready - Press and hold microphone to speak');
+                            };
+                            
+                            await audio.play();
+                        } else {
+                            throw new Error('TTS generation failed');
+                        }
+                    } catch (ttsErr) {
+                        // Fallback to browser speech
+                        updateStatus('🔊 Using browser speech synthesis...');
+                        const utterance = new SpeechSynthesisUtterance(aiText);
+                        utterance.rate = 1.0;
+                        utterance.pitch = 1.0;
+                        utterance.volume = 1.0;
+                        utterance.onend = () => {
+                            updateStatus('✅ Ready - Press and hold microphone to speak');
+                        };
+                        speechSynthesis.speak(utterance);
+                    }
+                } else {
+                    updateStatus('✅ Ready - Press and hold microphone to speak');
+                }
+                
+            } catch (err) {
+                showError('Processing error: ' + err.message);
+                updateStatus('✅ Ready - Press and hold microphone to speak');
+            }
+        }
+        
+        // Microphone button events
+        micBtn.addEventListener('mousedown', startRecording);
+        micBtn.addEventListener('mouseup', stopRecording);
+        micBtn.addEventListener('mouseleave', stopRecording);
+        
+        // Touch events for mobile
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startRecording();
+        });
+        micBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopRecording();
+        });
+        
+        // Prevent context menu on long press
+        micBtn.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        // Test connection on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/enhanced-status');
+                const data = await response.json();
+                
+                if (data.components && data.components.llm && data.components.tts && data.components.stt) {
+                    console.log('✅ All systems ready');
+                } else {
+                    console.log('⚠️ Some systems may not be ready');
+                }
+            } catch (err) {
+                console.log('❌ Backend connection test failed:', err);
+            }
+        });
+    </script>
+</body>
+</html>

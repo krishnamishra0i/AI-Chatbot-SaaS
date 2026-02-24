@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Real-time Speech Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .mic-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            font-size: 50px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .mic-btn:hover {
+            transform: scale(1.05);
+        }
+        .mic-btn.recording {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+        .status {
+            text-align: center;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .status.ready { background: #e8f5e8; color: #2e7d32; }
+        .status.listening { background: #fff3e0; color: #f57c00; }
+        .status.processing { background: #e3f2fd; color: #1565c0; }
+        .status.speaking { background: #f3e5f5; color: #7b1fa2; }
+        .transcript, .response {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            min-height: 60px;
+            border-left: 4px solid #4CAF50;
+        }
+        .response {
+            border-left-color: #2196F3;
+            background: #e3f2fd;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+        .test-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Simple Real-time Speech Test</h1>
+        <p><strong>Press and hold the microphone button to speak, then release to get an instant voice answer.</strong></p>
+        
+        <button id="micBtn" class="mic-btn">🎙️</button>
+        
+        <div id="status" class="status ready">Ready - Press and hold microphone to speak</div>
+        
+        <div>
+            <h3>You said:</h3>
+            <div id="transcript" class="transcript">...</div>
+        </div>
+        
+        <div>
+            <h3>AI Response:</h3>
+            <div id="response" class="response">...</div>
+        </div>
+        
+        <div id="error" class="error"></div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+            <h3>🔧 Troubleshooting:</h3>
+            <button class="test-btn" onclick="testBackend()">Test Backend Connection</button>
+            <button class="test-btn" onclick="testMicrophone()">Test Microphone</button>
+            <button class="test-btn" onclick="testTextToSpeech()">Test Text-to-Speech</button>
+            <div id="testResults" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        
+        const micBtn = document.getElementById('micBtn');
+        const status = document.getElementById('status');
+        const transcript = document.getElementById('transcript');
+        const response = document.getElementById('response');
+        const error = document.getElementById('error');
+        const testResults = document.getElementById('testResults');
+        
+        // Update status
+        function updateStatus(text, className) {
+            status.textContent = text;
+            status.className = 'status ' + className;
+        }
+        
+        // Show error
+        function showError(message) {
+            error.textContent = message;
+            error.style.display = 'block';
+            setTimeout(() => {
+                error.style.display = 'none';
+            }, 8000);
+        }
+        
+        // Test backend connection
+        async function testBackend() {
+            try {
+                const response = await fetch('http://localhost:8000/api/enhanced-status');
+                const data = await response.json();
+                testResults.innerHTML = `
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        ✅ Backend Connected!<br>
+                        LLM: ${data.components.llm.available ? '✅' : '❌'}<br>
+                        TTS: ${data.components.tts.available ? '✅' : '❌'}<br>
+                        STT: ${data.components.stt.available ? '✅' : '❌'}
+                    </div>
+                `;
+            } catch (err) {
+                testResults.innerHTML = `
+                    <div style="background: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        ❌ Backend Connection Failed: ${err.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Test microphone
+        async function testMicrophone() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                testResults.innerHTML = `
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        ✅ Microphone Access Granted!
+                    </div>
+                `;
+            } catch (err) {
+                testResults.innerHTML = `
+                    <div style="background: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        ❌ Microphone Access Denied: ${err.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Test text-to-speech
+        async function testTextToSpeech() {
+            try {
+                const response = await fetch('http://localhost:8000/api/tts/synthesize-audio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: 'Hello, this is a test of the text to speech system.',
+                        voice: 'en-US-GuyNeural'
+                    })
+                });
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    await audio.play();
+                    
+                    testResults.innerHTML = `
+                        <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                            ✅ Text-to-Speech Working! (Should be playing now)
+                        </div>
+                    `;
+                } else {
+                    throw new Error('TTS request failed');
+                }
+            } catch (err) {
+                testResults.innerHTML = `
+                    <div style="background: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        ❌ Text-to-Speech Failed: ${err.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Start recording
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    await processAudio(audioBlob);
+                };
+                
+                mediaRecorder.start(100); // Collect data every 100ms
+                isRecording = true;
+                micBtn.classList.add('recording');
+                updateStatus('🎤 Listening... Speak clearly into your microphone', 'listening');
+                error.style.display = 'none';
+                
+            } catch (err) {
+                showError('❌ Microphone error: ' + err.message);
+                updateStatus('Ready - Press and hold microphone to speak', 'ready');
+            }
+        }
+        
+        // Stop recording
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                micBtn.classList.remove('recording');
+                updateStatus('🧠 Processing your speech...', 'processing');
+            }
+        }
+        
+        // Process audio and get response
+        async function processAudio(audioBlob) {
+            try {
+                // Step 1: Transcribe audio
+                const formData = new FormData();
+                formData.append('audio_file', audioBlob, 'recording.wav');
+                
+                const sttResponse = await fetch('http://localhost:8000/api/stt/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const sttData = await sttResponse.json();
+                const userText = sttData.text || '';
+                
+                transcript.textContent = userText || '(Could not understand - please speak clearly)';
+                
+                if (!userText || userText.trim().length < 3) {
+                    showError('❌ Could not understand what you said. Please speak clearly and try again.');
+                    updateStatus('Ready - Press and hold microphone to speak', 'ready');
+                    return;
+                }
+                
+                // Step 2: Get AI response
+                const chatResponse = await fetch('http://localhost:8000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText })
+                });
+                
+                const chatData = await chatResponse.json();
+                const aiText = chatData.response || '';
+                
+                response.textContent = aiText || '(No response received)';
+                
+                // Step 3: Convert to speech
+                if (aiText) {
+                    updateStatus('🔊 Speaking response...', 'speaking');
+                    
+                    try {
+                        const ttsResponse = await fetch('http://localhost:8000/api/tts/synthesize-audio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                text: aiText,
+                                voice: 'en-US-GuyNeural'
+                            })
+                        });
+                        
+                        if (ttsResponse.ok) {
+                            const audioBlob = await ttsResponse.blob();
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            const audio = new Audio(audioUrl);
+                            
+                            audio.onended = () => {
+                                updateStatus('Ready - Press and hold microphone to speak', 'ready');
+                                URL.revokeObjectURL(audioUrl);
+                            };
+                            
+                            audio.onerror = () => {
+                                showError('⚠️ Audio playback failed, but you can read the response above');
+                                updateStatus('Ready - Press and hold microphone to speak', 'ready');
+                            };
+                            
+                            await audio.play();
+                        } else {
+                            throw new Error('TTS request failed');
+                        }
+                    } catch (ttsErr) {
+                        // Fallback to browser speech
+                        const utterance = new SpeechSynthesisUtterance(aiText);
+                        utterance.onend = () => {
+                            updateStatus('Ready - Press and hold microphone to speak', 'ready');
+                        };
+                        speechSynthesis.speak(utterance);
+                    }
+                } else {
+                    updateStatus('Ready - Press and hold microphone to speak', 'ready');
+                }
+                
+            } catch (err) {
+                showError('❌ Processing error: ' + err.message);
+                updateStatus('Ready - Press and hold microphone to speak', 'ready');
+            }
+        }
+        
+        // Microphone button events
+        micBtn.addEventListener('mousedown', startRecording);
+        micBtn.addEventListener('mouseup', stopRecording);
+        micBtn.addEventListener('mouseleave', stopRecording);
+        
+        // Touch events for mobile
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startRecording();
+        });
+        micBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopRecording();
+        });
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(testBackend, 1000);
+        });
+    </script>
+</body>
+</html>

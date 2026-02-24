@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena LMS - AI-Powered Learning Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: #fff;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            z-index: 100;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #3b82f6;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f3e8ff 100%);
+            padding: 120px 20px 80px;
+            text-align: center;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #1e40af, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #2563eb;
+            padding: 14px 32px;
+            border-radius: 8px;
+            border: 2px solid #3b82f6;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #f0f9ff;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            text-align: center;
+            color: #1e40af;
+        }
+
+        /* Enterprise Products */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .product-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #000;
+       }
+
+        .product-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .product-card a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .product-card a:hover {
+            color: #2563eb;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .feature-list {
+            list-style: none;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* CTA Sections */
+        .cta-section {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af, #312e81);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 80px 0;
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+            padding: 14px 36px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 50px 20px 20px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Floating Button */
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #c41e3a, #a62d2d);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .floating-button:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 30px rgba(196, 30, 58, 0.6);
+        }
+
+        .floating-button.active {
+            background: linear-gradient(135deg, #a62d2d, #c41e3a);
+        }
+
+        /* Chatbot Container */
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 998;
+            pointer-events: none;
+        }
+
+        .chatbot-container.active {
+            width: 600px;
+            height: 800px;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-window {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #c41e3a, #a62d2d);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(196, 30, 58, 0.3);
+        }
+
+        .chat-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .avatar-section {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(196, 30, 58, 0.05), rgba(166, 45, 45, 0.05));
+            border-bottom: 1px solid rgba(196, 30, 58, 0.1);
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #c41e3a;
+            box-shadow: 0 0 20px rgba(196, 30, 58, 0.3);
+        }
+
+        .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: avatarPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .avatar-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-top: 10px;
+            box-shadow: 0 0 10px #4ade80;
+        }
+
+        .avatar-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 8px;
+        }
+
+        .avatar-status-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .suggested-prompts {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .prompt-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .prompt-btn:hover {
+            background: #c41e3a;
+            color: white;
+            border-color: #c41e3a;
+            transform: translateY(-2px);
+        }
+
+        .messages-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user .message-content {
+            background: linear-gradient(135deg, #c41e3a, #a62d2d);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot .message-content {
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.5; }
+            30% { opacity: 1; }
+        }
+
+        .input-section {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #c41e3a;
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .action-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c41e3a, #a62d2d);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        .messages-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-section::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .messages-section::-webkit-scrollbar-thumb {
+            background: #c41e3a;
+            border-radius: 3px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .chatbot-container.active {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 120px);
+                bottom: 80px;
+                right: 10px;
+            }
+
+            section {
+                padding: 40px 15px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">A</div>
+                Athena LMS
+            </div>
+            <ul>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#solutions">Solutions</a></li>
+                <li><a href="#platform">Platform</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><button class="btn-secondary">Login</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>The Future of Learning and Development with AI</h1>
+            <p>Athena Learning Management System is an AI-powered education ecosystem that unifies course creation, learner engagement, and actionable analytics — all in one intuitive workspace.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary">Book Demo</button>
+                <button class="btn-outline">Contact Us</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enterprise Products Section -->
+    <section id="solutions">
+        <h2>Athena Enterprise</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 40px;">AI Products for Learning & Training</p>
+        
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-icon">🎓</div>
+                <h3>AI Powered Course Creation</h3>
+                <p>Build SCORM courses 80% faster</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">🎨</div>
+                <h3>AI Video, Image, Text</h3>
+                <p>Design learning visuals instantly</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">👤</div>
+                <h3>Virtual Instructor Avatar</h3>
+                <p>Live training at global scale</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">📚</div>
+                <h3>Create Your Audible Book</h3>
+                <p>Turn PDFs into interactive books</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">📊</div>
+                <h3>ChatBot AI Agents</h3>
+                <p>24/7 lifelike learner support</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">⚙️</div>
+                <h3>Learning Management System</h3>
+                <p>Manage learner journeys</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">🌐</div>
+                <h3>Custom Website Builder</h3>
+                <p>Launch branded academies fast</p>
+                <a href="#">Explore Product →</a>
+            </div>
+
+            <div class="product-card">
+                <div class="product-icon">📈</div>
+                <h3>Advanced Analytics</h3>
+                <p>Measure learning outcomes</p>
+                <a href="#">Explore Product →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <h2>Athena's Stand-Out Suite of Features</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>✨ Smart Content Generation</h3>
+                <ul class="feature-list">
+                    <li>Create lessons from any input with AI</li>
+                    <li>Auto-generate outlines</li>
+                    <li>Multi-format support</li>
+                    <li>Instant translations</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎯 Adaptive Learning Paths</h3>
+                <ul class="feature-list">
+                    <li>Personalize experiences</li>
+                    <li>Skill gap analysis</li>
+                    <li>Custom pathways</li>
+                    <li>Progress tracking</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎮 Interactive Elements</h3>
+                <ul class="feature-list">
+                    <li>Drag & drop builder</li>
+                    <li>50+ interaction types</li>
+                    <li>Quizzes & simulations</li>
+                    <li>Real-time feedback</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>📊 Advanced Analytics</h3>
+                <ul class="feature-list">
+                    <li>Track performance</li>
+                    <li>Learning analytics</li>
+                    <li>ROI measurement</li>
+                    <li>Custom reports</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section>
+        <div class="cta-section">
+            <h2>Have Questions About Athena?</h2>
+            <p>Connect with our specialists to architect the perfect learning environment for your organization.</p>
+            <button class="cta-button">Connect With Us</button>
+        </div>
+    </section>
+
+    <!-- Everything You Need Section -->
+    <section id="platform">
+        <h2>Everything You Need to Create World-Class Training</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 40px;">Our platform combines cutting-edge AI with proven instructional design principles</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🚀 Rapid Deployment</h3>
+                <ul class="feature-list">
+                    <li>No-code course builder</li>
+                    <li>Pre-built templates</li>
+                    <li>Quick launch</li>
+                    <li>Instant publishing</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🔐 Enterprise Security</h3>
+                <ul class="feature-list">
+                    <li>SSO integration</li>
+                    <li>Data encryption</li>
+                    <li>Compliance ready</li>
+                    <li>Advanced permissions</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌍 Global Scale</h3>
+                <ul class="feature-list">
+                    <li>Multi-language support</li>
+                    <li>Time zone handling</li>
+                    <li>Unlimited learners</li>
+                    <li>Distributed delivery</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🤝 Collaboration Tools</h3>
+                <ul class="feature-list">
+                    <li>Team workspaces</li>
+                    <li>Discussion forums</li>
+                    <li>Peer learning</li>
+                    <li>Social features</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section>
+        <div class="cta-section">
+            <h2>Still Have Questions?</h2>
+            <p>Our specialists are ready to help you architect the perfect learning environment.</p>
+            <button class="cta-button">Book a Demo</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Athena</h4>
+                <a href="#">Company</a>
+                <a href="#">Blog</a>
+                <a href="#">Careers</a>
+                <a href="#">Press</a>
+            </div>
+            <div class="footer-section">
+                <h4>Products</h4>
+                <a href="#">LMS Platform</a>
+                <a href="#">Course Builder</a>
+                <a href="#">Analytics</a>
+                <a href="#">AI Assistant</a>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <a href="#">Documentation</a>
+                <a href="#">Support</a>
+                <a href="#">API Docs</a>
+                <a href="#">Community</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookies</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Athena LMS. All Rights Reserved. | AI-Powered Learning Solutions</p>
+        </div>
+    </footer>
+
+    <!-- Floating Button -->
+    <button class="floating-button" id="floatingBtn" title="Open Chat">💬</button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chat-window">
+            <div class="chat-header">
+                <h3>Athena AI Assistant</h3>
+                <button class="close-btn" id="closeBtn">✕</button>
+            </div>
+
+            <div class="avatar-section">
+                <div class="avatar-container">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23c41e3a;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23a62d2d;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='30' r='20' fill='%23fdbcb4'/%3E%3Crect x='20' y='45' width='60' height='45' rx='10' fill='url(%23grad)'/%3E%3Ccircle cx='35' cy='28' r='3' fill='%23333'/%3E%3Ccircle cx='65' cy='28' r='3' fill='%23333'/%3E%3Cpath d='M 35 35 Q 50 40 65 35' stroke='%23333' stroke-width='2' fill='none'/%3E%3C/svg%3E" alt="Avatar" class="avatar-image">
+                </div>
+                <div class="avatar-status"></div>
+                <h4 class="avatar-name">Ambassador Amber</h4>
+                <p class="avatar-status-text" id="statusText">Ready to chat 🎤</p>
+            </div>
+
+            <div class="suggested-prompts">
+                <button class="prompt-btn" onclick="sendPrompt('Tell me about Athena LMS')">Tell me about Athena</button>
+                <button class="prompt-btn" onclick="sendPrompt('How can you help me?')">How can you help?</button>
+                <button class="prompt-btn" onclick="sendPrompt('What are your features?')">Features</button>
+            </div>
+
+            <div class="messages-section" id="messagesSection">
+                <div class="welcome-message">
+                    Welcome! I'm Athena AI Assistant 🤖<br>
+                    Ask me anything about our platform!
+                </div>
+            </div>
+
+            <div class="input-section">
+                <input 
+                    type="text" 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type or tap microphone..."
+                    autocomplete="off"
+                >
+                <button class="action-button" id="micBtn" title="Voice Input">🎤</button>
+                <button class="action-button" id="sendBtn" title="Send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const floatingBtn = document.getElementById('floatingBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+        const messagesSection = document.getElementById('messagesSection');
+        const statusText = document.getElementById('statusText');
+
+        // Web Speech API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        const synth = window.speechSynthesis;
+
+        let isListening = false;
+        let isSpeaking = false;
+
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        // Toggle Chatbot
+        floatingBtn.addEventListener('click', () => {
+            chatbotContainer.classList.toggle('active');
+            floatingBtn.classList.toggle('active');
+            if (chatbotContainer.classList.contains('active')) {
+                messageInput.focus();
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+            floatingBtn.classList.remove('active');
+        });
+
+        // Send Message
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            messageInput.value = '';
+            addMessage(text, 'user');
+            updateStatus('Thinking...', '⏳');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                if (!response.ok) throw new Error('API Error');
+
+                const data = await response.json();
+                const botResponse = data.response;
+
+                showTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    addMessage(botResponse, 'bot');
+                    speakMessage(botResponse);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Error:', error);
+                const fallbackMessage = "I apologize, I couldn't process that. Please try again.";
+                addMessage(fallbackMessage, 'bot');
+                speakMessage(fallbackMessage);
+            }
+        }
+
+        function sendPrompt(text) {
+            messageInput.value = text;
+            sendMessage();
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            messagesSection.appendChild(messageDiv);
+            messagesSection.scrollTop = messagesSection.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messagesSection.appendChild(typingDiv);
+            messagesSection.scrollTop = messagesSection.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function speakMessage(text) {
+            if (isSpeaking) synth.cancel();
+            
+            updateStatus('Speaking...', '🎵');
+            isSpeaking = true;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1;
+            utterance.pitch = 1.1;
+            utterance.volume = 1;
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                updateStatus('Ready to chat 🎤', '✓');
+            };
+
+            synth.speak(utterance);
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (!isListening) {
+                startListening();
+            } else {
+                stopListening();
+            }
+        });
+
+        function startListening() {
+            isListening = true;
+            micBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            updateStatus('Listening...', '🎧');
+            recognition.start();
+        }
+
+        function stopListening() {
+            isListening = false;
+            micBtn.style.background = 'linear-gradient(135deg, #c41e3a, #a62d2d)';
+            recognition.stop();
+        }
+
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            messageInput.value = transcript;
+
+            if (event.results[0].isFinal) {
+                stopListening();
+                setTimeout(sendMessage, 500);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            updateStatus('Microphone error', '❌');
+            stopListening();
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            micBtn.style.background = 'linear-gradient(135deg, #c41e3a, #a62d2d)';
+        };
+
+        function updateStatus(text, icon) {
+            statusText.textContent = `${text} ${icon}`;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        updateStatus('Ready to chat 🎤', '✓');
+    </script>
+</body>
+</html>
