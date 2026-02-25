@@ -5,140 +5,627 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Athena - Enterprise AI Avatar Platform</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --secondary: #22d3ee;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #0f0f23;
+            --white: #ffffff;
+            --gray-50: #1a1b3a;
+            --gray-100: #0f0f23;
+            --gray-200: #1e1f3a;
+            --gray-300: #2a2b4a;
+            --gray-400: #3a3b5a;
+            --gray-500: #4a4b6a;
+            --gray-600: #6a6b7a;
+            --gray-700: #8a8b9a;
+            --gray-800: #aaaabb;
+            --gray-900: #cacadd;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 25px 50px -12px rgba(6, 182, 212, 0.4);
+            --radius: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-2xl: 2rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #333;
-            line-height: 1.6;
-            background: #f5f7fa;
-        }
-
-        /* Navigation */
+        /* Clean Navigation - Soul Machines Style */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 40px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '✦';
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #06b6d4;
+            background: rgba(6, 182, 212, 0.05);
         }
 
         .cta-btn {
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             font-weight: 600;
-            transition: all 0.3s;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3);
         }
 
         .cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
         }
 
         main {
             margin-top: 70px;
         }
 
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 100px 40px;
+        /* Animated Heading Styles */
+        .animated-heading {
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
-        .hero h1 {
-            font-size: 56px;
-            margin-bottom: 20px;
-            font-weight: 800;
-        }
-
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 40px;
-        }
-
-        .hero-buttons {
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
             display: flex;
-            gap: 20px;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .word {
+            display: inline-block;
+            position: relative;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: wordAnimation 3s infinite;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .word:nth-child(1) { animation-delay: 0s; }
+        .word:nth-child(2) { animation-delay: 0.5s; }
+        .word:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes wordAnimation {
+            0%, 100% { 
+                transform: translateY(0) scale(1);
+                filter: brightness(1);
+            }
+            25% { 
+                transform: translateY(-10px) scale(1.05);
+                filter: brightness(1.2);
+            }
+            50% { 
+                transform: translateY(0) scale(1);
+                filter: brightness(1);
+            }
+            75% { 
+                transform: translateY(-5px) scale(1.02);
+                filter: brightness(1.1);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--gray-300);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.5s;
+        }
+
+        /* Authentication Section */
+        .auth-section {
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.7s;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn-primary {
-            padding: 15px 40px;
-            background: white;
-            color: #667eea;
+        .auth-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
             border: none;
-            border-radius: 30px;
-            font-weight: 700;
+            border-radius: var(--radius-xl);
+            font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .google-btn {
+            background: white;
+            color: var(--gray-800);
+            border: 2px solid var(--gray-300);
+            box-shadow: var(--shadow-md);
+        }
+
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .google-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .btn-text {
+            font-weight: 600;
+        }
+
+        /* User Info Display */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--gray-400);
+            color: var(--gray-300);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        /* Real-time Effects */
+        .word::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { opacity: 0; }
+            10% { opacity: 0.1; }
+            20% { opacity: 0; }
+            30% { opacity: 0.2; }
+            40% { opacity: 0; }
+            50% { opacity: 0.1; }
+            60% { opacity: 0; }
+            70% { opacity: 0.3; }
+            80% { opacity: 0; }
+            90% { opacity: 0.1; }
+        }
+
+        /* Particle Effects */
+        .animated-heading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            animation: particle 3s infinite;
+        }
+
+        @keyframes particle {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(20);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Hero Section - Soul Machines Style */
+        /* Hero Section - Soul Machines Style */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            padding-left: 2rem;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            max-width: 500px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(6, 182, 212, 0.4);
         }
 
-        /* Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 80px 40px;
+        .btn-secondary {
+            background: white;
+            color: #06b6d4;
+            border: 2px solid #06b6d4;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #06b6d4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-showcase {
+            position: relative;
+            text-align: center;
+        }
+
+        .hero-avatar {
+            width: 400px;
+            height: 400px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 4px solid white;
+        }
+
+        .avatar-status {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+                padding: 0 1rem;
+            }
+
+            .hero-text {
+                padding-left: 0;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-description {
+                max-width: none;
+            }
+
+            .hero-avatar {
+                width: 300px;
+                height: 300px;
+            }
+        }
+
+        /* Product Showcase - Soul Machines Style */
+        .product-showcase {
+            background: #ffffff;
+            padding: 100px 2.5rem;
+        }
+
+        .container {
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .feature-card {
-            background: white;
-            padding: 35px;
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: #666666;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: #ffffff;
+            padding: 2.5rem;
             border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.15);
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
         }
 
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
+        .product-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
         }
 
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 12px;
+        .product-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            line-height: 1.3;
         }
 
-        .feature-card p {
-            color: #666;
+        .product-card p {
+            color: #666666;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .product-category {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         /* Floating Chatbot Button */
@@ -148,7 +635,7 @@
             right: 20px;
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -156,14 +643,14 @@
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            box-shadow: 0 8px 35px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 35px rgba(6, 182, 212, 0.4);
             transition: all 0.3s ease;
             z-index: 999;
         }
 
         .chatbot-btn:hover {
             transform: scale(1.15);
-            box-shadow: 0 12px 45px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 12px 45px rgba(6, 182, 212, 0.6);
         }
 
         /* Chatbot Container - Fixed Position */
@@ -183,7 +670,7 @@
         /* Resize Handle - Simple & Working for All Directions */
         .resize-handle {
             position: absolute;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: 2px solid white;
             opacity: 0;
             z-index: 1010;
@@ -195,7 +682,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
         }
 
         /* Edge handles - visible bars */
@@ -237,7 +724,7 @@
         #chatbotContainer > div {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            background: linear-gradient(135deg, #000000 0%, #0f0f23 50%, #1a1b3a 100%);
             border-radius: 24px;
             display: grid;
             grid-template-columns: 0.7fr 1.3fr;
@@ -245,11 +732,122 @@
         }
 
         /* Footer */
-        footer {
-            background: #1f2937;
+        .footer {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 80px 0 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
             color: white;
-            padding: 60px 40px;
-            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: #06b6d4;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .social-link:hover {
+            background: #06b6d4;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .footer-bottom p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #06b6d4;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+
+            .footer-bottom-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 768px) {
@@ -311,8 +909,8 @@
         }
 
         @keyframes micReady {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
-            50% { box-shadow: 0 0 0 12px rgba(102, 126, 234, 0.2); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+            50% { box-shadow: 0 0 0 12px rgba(6, 182, 212, 0.2); }
         }
 
         @keyframes readyPulse {
@@ -326,8 +924,8 @@
         }
 
         @keyframes glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+            0%, 100% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
         }
 
         /* Message Styling */
@@ -338,13 +936,13 @@
         }
 
         .user-message > div {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 12px 18px;
             border-radius: 18px 18px 4px 18px;
             max-width: 80%;
             word-wrap: break-word;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
             font-size: 14px;
             line-height: 1.5;
         }
@@ -376,178 +974,999 @@
             border-radius: 18px 18px 18px 4px;
             max-width: 80%;
             word-wrap: break-word;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            box-shadow: 0 2px 10px rgba(6, 182, 212, 0.08);
             font-size: 14px;
             line-height: 1.5;
+        }
+
+        /* Workforce Connect Section */
+        .workforce-connect {
+            background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workforce-connect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.03)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.02)"/><circle cx="90" cy="30" r="0.5" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .connect-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 1;
+            align-items: center;
+        }
+
+        .connect-text h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .connect-text p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .connect-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .connect-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .connect-feature .feature-icon {
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .connect-feature .feature-content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+
+        .connect-feature .feature-content p {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .connect-cta {
+            margin-top: 2rem;
+        }
+
+        .connect-cta .btn-primary {
+            background: white;
+            color: #06b6d4;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .connect-cta .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .connect-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .integration-showcase {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .integration-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .integration-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .integration-logo {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .integration-item span {
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .connect-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .connect-text h2 {
+                font-size: 2.25rem;
+            }
+
+            .integration-showcase {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Core Technology Section */
+        .core-technology {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .core-technology::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+        }
+
+        .tech-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 1;
+            align-items: center;
+        }
+
+        .tech-text h2 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #06b6d4;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .tech-text h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .tech-text p {
+            font-size: 1.125rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .tech-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tech-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .tech-feature .feature-icon {
+            font-size: 1.5rem;
+            color: #06b6d4;
+            flex-shrink: 0;
+        }
+
+        .tech-feature .feature-content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-feature .feature-content p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .tech-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tech-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tech-stat {
+            text-align: center;
+        }
+
+        .tech-stat .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #06b6d4;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-stat .stat-label {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .tech-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .tech-text h3 {
+                font-size: 2rem;
+            }
+
+            .tech-showcase {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Platform Overview Section */
+        .platform-overview {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-overview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%);
+        }
+
+        .platform-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 1;
+            align-items: center;
+        }
+
+        .platform-text h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .platform-text p {
+            font-size: 1.25rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .platform-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-text p {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .platform-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .platform-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .platform-text h2 {
+                font-size: 2.25rem;
+            }
+
+            .platform-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Integrations Section */
+        .integrations-section {
+            background: white;
+            padding: 80px 0;
+        }
+
+        .integrations-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            align-items: center;
+        }
+
+        .integrations-text h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .integrations-text p {
+            font-size: 1.25rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .integration-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .integration-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .integration-feature .feature-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .integration-feature .feature-content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .integration-feature .feature-content p {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .integration-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .integration-item:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.1);
+        }
+
+        .integration-logo {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .integration-item span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        @media (max-width: 768px) {
+            .integrations-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .integrations-text h2 {
+                font-size: 2.25rem;
+            }
+
+            .integrations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Enterprise Section */
+        .enterprise-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 80px 0;
+        }
+
+        .enterprise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .enterprise-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .enterprise-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .enterprise-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .enterprise-card p {
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .enterprise-grid {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+
+            .enterprise-card {
+                padding: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
-        <div class="logo">📚 ATHENA AI</div>
-        <button class="cta-btn" onclick="openChatbot()">Get Started</button>
-    </nav>
+            <div class="logo">Athena</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#integrations">Integrations</a></li>
+                <li><a href="#enterprise">Enterprise</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><button class="cta-btn">Get Started</button></li>
+            </ul>
+        </nav>
 
     <main>
-        <!-- Hero Section -->
+        <!-- Hero Section - Soul Machines Style -->
         <section class="hero">
-            <h1>Enterprise AI Avatar Platform</h1>
-            <p>Real-time voice interactions with photorealistic avatars</p>
-            <div class="hero-buttons">
-                <button class="btn-primary" onclick="openChatbot()">Start Chatting Now</button>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">Meet Athena</h1>
+                    <h2 class="hero-subtitle">AI Avatar Platform</h2>
+                    <p class="hero-description">
+                        Our groundbreaking platform empowers businesses to deploy truly human-like AI avatars into high-ROI roles,
+                        with intelligent orchestration across the AI stack.
+                    </p>
+                    <div class="hero-ctas">
+                        <button class="btn-primary" onclick="openChatbot()">Start 7-Day FREE Trial</button>
+                        <button class="btn-secondary" onclick="scrollToPricing()">Contact Sales</button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="avatar-showcase">
+                        <img src="src/frontend/dist/images/Paulmichael.png" alt="AI Avatar" class="hero-avatar">
+                        <div class="avatar-status">
+                            <div class="status-dot"></div>
+                            <span>Online & Ready</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Features Section -->
-        <section class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🎤</div>
-                <h3>Real-Time Voice Input</h3>
-                <p>Speak naturally and let our speech-to-text technology understand you instantly</p>
-            </div>
+        <!-- Product Showcase - Soul Machines Style -->
+        <section class="product-showcase">
+            <div class="container">
+                <div class="section-header">
+                    <h2>AI Avatar Solutions</h2>
+                    <p>Choose from templates of top-requested AI Avatars for immediate impact</p>
+                </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🔊</div>
-                <h3>Natural Voice Output</h3>
-                <p>Get responses spoken with human-like voice powered by neural technology</p>
-            </div>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-icon">🎧</div>
+                        <h3>Customer Service Agent</h3>
+                        <p>Quickly and empathetically resolve simple customer inquiries with intelligent escalation as needed, resulting in improved customer satisfaction and reduced wait times.</p>
+                        <span class="product-category">CX</span>
+                    </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🎭</div>
-                <h3>Photorealistic Avatars</h3>
-                <p>Meet lifelike AI avatars that create engaging face-to-face conversations</p>
-            </div>
+                    <div class="product-card">
+                        <div class="product-icon">📈</div>
+                        <h3>Operations Optimization Coach</h3>
+                        <p>Assist team leads with organizational design, talent strategy, inventory planning, change management and more, surfacing possible pain points and solutions.</p>
+                        <span class="product-category">ENTERPRISE</span>
+                    </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3>Multi-Language Support</h3>
-                <p>Communicate in any language with seamless translation</p>
-            </div>
+                    <div class="product-card">
+                        <div class="product-icon">💼</div>
+                        <h3>Sales Assistant</h3>
+                        <p>Boost conversions with AI sales agents that engage prospects naturally, qualify leads, and provide personalized product recommendations.</p>
+                        <span class="product-category">SALES</span>
+                    </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🔐</div>
-                <h3>Enterprise Security</h3>
-                <p>Bank-level encryption and GDPR, HIPAA compliance</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Sub-second Latency</h3>
-                <p>Experience near-instantaneous responses</p>
+                    <div class="product-card">
+                        <div class="product-icon">🎓</div>
+                        <h3>Learning & Development Guide</h3>
+                        <p>Create engaging interactive training experiences with AI avatars that adapt to learner needs and provide personalized coaching.</p>
+                        <span class="product-category">L&D</span>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Used by Leading Teams Section -->
-        <section style="background: white; padding: 80px 40px;">
-            <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800;">Used by Leading Teams</h2>
-            <p style="text-align: center; color: #666; font-size: 16px; margin-bottom: 60px;">Athena powers real-time AI interactions across industries</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto;">
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">📢</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Marketing</h4>
-                    <p style="color: #666; font-size: 14px;">Create personalized video content at scale with AI avatars</p>
+        <!-- Workforce Connect Section - Soul Machines Style -->
+        <section class="workforce-connect">
+            <div class="container">
+                <div class="connect-content">
+                    <div class="connect-text">
+                        <h2>Athena Connect™</h2>
+                        <p>Our powerful integration platform allows you to deploy AI avatars within the workflow products you already use most, for just $40,000 annually.</p>
+                        <div class="connect-features">
+                            <div class="connect-feature">
+                                <div class="feature-icon">🔗</div>
+                                <div class="feature-content">
+                                    <h4>Seamless Integration</h4>
+                                    <p>Deploy avatars directly in your existing tools and platforms</p>
+                                </div>
+                            </div>
+                            <div class="connect-feature">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-content">
+                                    <h4>Zero Development</h4>
+                                    <p>No coding required - works with your current infrastructure</p>
+                                </div>
+                            </div>
+                            <div class="connect-feature">
+                                <div class="feature-icon">🎯</div>
+                                <div class="feature-content">
+                                    <h4>Enterprise Security</h4>
+                                    <p>Bank-level security with full compliance and data protection</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="connect-cta">
+                            <button class="btn-primary">Try it FREE for 7 days!</button>
+                        </div>
+                    </div>
+                    <div class="connect-visual">
+                        <div class="integration-showcase">
+                            <div class="integration-item">
+                                <div class="integration-logo">💻</div>
+                                <span>PowerPoint</span>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-logo">🎨</div>
+                                <span>Canva</span>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-logo">📊</div>
+                                <span>Google Slides</span>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-logo">🔌</div>
+                                <span>API</span>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-logo">📱</div>
+                                <span>Mobile Apps</span>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-logo">☁️</div>
+                                <span>Cloud Services</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">🎬</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Content Creators</h4>
-                    <p style="color: #666; font-size: 14px;">Produce professional video content 10x faster</p>
+        <!-- Core Technology Section - Soul Machines Style -->
+        <section class="core-technology">
+            <div class="container">
+                <div class="tech-content">
+                    <div class="tech-text">
+                        <h2>CORE TECHNOLOGY</h2>
+                        <h3>The Power of Experiential AI</h3>
+                        <p>Combining cognitive modeling with embodied cognition, our patented Experiential AI™ technology empowers our multimodal Agents with the underlying biological and neurological human systems that create authentic human-like emotion, understanding and interaction.</p>
+                        <div class="tech-features">
+                            <div class="tech-feature">
+                                <div class="feature-icon">🧠</div>
+                                <div class="feature-content">
+                                    <h4>Cognitive Modeling</h4>
+                                    <p>Advanced neural networks that simulate human thought processes and emotional responses</p>
+                                </div>
+                            </div>
+                            <div class="tech-feature">
+                                <div class="feature-icon">🎭</div>
+                                <div class="feature-content">
+                                    <h4>Embodied Cognition</h4>
+                                    <p>Physical manifestation of intelligence through natural gestures and expressions</p>
+                                </div>
+                            </div>
+                            <div class="tech-feature">
+                                <div class="feature-icon">🌐</div>
+                                <div class="feature-content">
+                                    <h4>Multimodal Intelligence</h4>
+                                    <p>Seamless integration of voice, vision, and contextual understanding</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-visual">
+                        <div class="tech-showcase">
+                            <div class="tech-stat">
+                                <div class="stat-number">500M+</div>
+                                <div class="stat-label">Interactions Processed</div>
+                            </div>
+                            <div class="tech-stat">
+                                <div class="stat-number">50+</div>
+                                <div class="stat-label">Languages Supported</div>
+                            </div>
+                            <div class="tech-stat">
+                                <div class="stat-number">99.9%</div>
+                                <div class="stat-label">Accuracy Rate</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">🎓</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Learning & Development</h4>
-                    <p style="color: #666; font-size: 14px;">Create engaging interactive training</p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">💼</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Sales</h4>
-                    <p style="color: #666; font-size: 14px;">Boost conversions with AI sales agents</p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">😊</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Customer Experience</h4>
-                    <p style="color: #666; font-size: 14px;">Deliver personalized customer support</p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 30px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.15); cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 15px;">💻</div>
-                    <h4 style="font-size: 18px; margin-bottom: 10px; color: #333; font-weight: 700;">Developers</h4>
-                    <p style="color: #666; font-size: 14px;">Build next-gen applications with our API</p>
+        <!-- Platform Overview Section -->
+        <section class="platform-overview">
+            <div class="container">
+                <div class="platform-content">
+                    <div class="platform-text">
+                        <h2>Advanced AI Avatar Platform</h2>
+                        <p>Transform your business with lifelike AI avatars that engage, educate, and convert. Our enterprise-grade platform delivers human-like interactions at scale.</p>
+                        <div class="platform-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">🎭</div>
+                                <div class="feature-text">
+                                    <h4>Photorealistic Avatars</h4>
+                                    <p>Customizable AI avatars with natural expressions and gestures</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">🗣️</div>
+                                <div class="feature-text">
+                                    <h4>Conversational AI</h4>
+                                    <p>Advanced NLP with context-aware responses and personality</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-text">
+                                    <h4>Real-time Processing</h4>
+                                    <p>Sub-second response times with global CDN distribution</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="platform-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">99.9%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">500M+</div>
+                            <div class="stat-label">Interactions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Languages</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Support</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Integrations Section -->
-        <section style="background: linear-gradient(135deg, #f5f7fa, #e8ecff); padding: 80px 40px;">
-            <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
-                <div>
-                    <h2 style="font-size: 48px; margin-bottom: 30px; color: #333; font-weight: 800;">Seamless Integrations</h2>
-                    <p style="color: #666; font-size: 16px; margin-bottom: 20px; line-height: 1.8;">Combine Athena with your favorite tools and platforms to evolve your workflows</p>
-                    <p style="color: #666; font-size: 16px; line-height: 1.8;">We integrate with leading platforms including presentation software, design tools, and API-based solutions</p>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">💻 PowerPoint</div>
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">🎨 Canva</div>
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">📊 Google Slides</div>
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">🔌 API</div>
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">📱 Mobile Apps</div>
-                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb; text-align: center; font-weight: 700; color: #667eea; cursor: pointer; transition: all 0.3s;">☁️ Cloud Services</div>
+        <section class="integrations-section">
+            <div class="container">
+                <div class="integrations-content">
+                    <div class="integrations-text">
+                        <h2>Seamless Integrations</h2>
+                        <p>Connect Athena with your existing tools and workflows. Our robust API and pre-built integrations ensure smooth deployment across your tech stack.</p>
+                        <div class="integration-features">
+                            <div class="integration-feature">
+                                <div class="feature-icon">🔗</div>
+                                <div class="feature-content">
+                                    <h4>RESTful API</h4>
+                                    <p>Full programmatic access with comprehensive documentation</p>
+                                </div>
+                            </div>
+                            <div class="integration-feature">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-content">
+                                    <h4>Webhooks</h4>
+                                    <p>Real-time event notifications and automated workflows</p>
+                                </div>
+                            </div>
+                            <div class="integration-feature">
+                                <div class="feature-icon">🔧</div>
+                                <div class="feature-content">
+                                    <h4>SDKs</h4>
+                                    <p>JavaScript, Python, and mobile SDKs for rapid development</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="integrations-grid">
+                        <div class="integration-item">
+                            <div class="integration-logo">💻</div>
+                            <span>PowerPoint</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">🎨</div>
+                            <span>Canva</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">📊</div>
+                            <span>Google Slides</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">🔌</div>
+                            <span>API</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">📱</div>
+                            <span>Mobile Apps</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">☁️</div>
+                            <span>Cloud Services</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">💾</div>
+                            <span>Databases</span>
+                        </div>
+                        <div class="integration-item">
+                            <div class="integration-logo">🤖</div>
+                            <span>AI Platforms</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Enterprise Ready Section -->
-        <section style="background: white; padding: 80px 40px;">
-            <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800;">Enterprise-Ready</h2>
-            <p style="text-align: center; color: #666; font-size: 16px; margin-bottom: 60px;">Built for the highest standards of reliability, security, and support</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto;">
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">🔒</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">Privacy First</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">Your data is protected with advanced encryption and strict compliance with GDPR, CCPA, and international standards</p>
+        <section class="enterprise-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Enterprise-Ready Platform</h2>
+                    <p>Built for the highest standards of reliability, security, and support</p>
                 </div>
 
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">🛡️</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">Security Certified</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">SOC 2 Type II certification with continuous penetration testing by leading security experts</p>
-                </div>
+                <div class="enterprise-grid">
+                    <div class="enterprise-card">
+                        <div class="card-icon">🔒</div>
+                        <h3>Privacy First</h3>
+                        <p>Your data is protected with advanced encryption and strict compliance with GDPR, CCPA, and international standards</p>
+                    </div>
 
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">⚖️</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">Ethical AI</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">We ensure our products benefit society with responsible AI and ethical use clauses built in</p>
-                </div>
+                    <div class="enterprise-card">
+                        <div class="card-icon">🛡️</div>
+                        <h3>Security Certified</h3>
+                        <p>SOC 2 Type II certification with continuous penetration testing by leading security experts</p>
+                    </div>
 
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">🎯</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">24/7 Support</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">Dedicated support team available round-the-clock with SLA guarantees for enterprise users</p>
-                </div>
+                    <div class="enterprise-card">
+                        <div class="card-icon">⚖️</div>
+                        <h3>Ethical AI</h3>
+                        <p>We ensure our products benefit society with responsible AI and ethical use clauses built in</p>
+                    </div>
 
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">⚙️</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">99.99% Uptime</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">Enterprise-grade infrastructure with global redundancy and automatic failover</p>
-                </div>
+                    <div class="enterprise-card">
+                        <div class="card-icon">🎯</div>
+                        <h3>24/7 Support</h3>
+                        <p>Dedicated support team available round-the-clock with SLA guarantees for enterprise users</p>
+                    </div>
 
-                <div style="text-align: center;">
-                    <div style="font-size: 56px; margin-bottom: 20px;">📈</div>
-                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #333; font-weight: 700;">Scalable Architecture</h3>
-                    <p style="color: #666; line-height: 1.7; font-size: 15px;">Handle millions of concurrent interactions with auto-scaling infrastructure</p>
+                    <div class="enterprise-card">
+                        <div class="card-icon">⚙️</div>
+                        <h3>99.99% Uptime</h3>
+                        <p>Enterprise-grade infrastructure with global redundancy and automatic failover</p>
+                    </div>
+
+                    <div class="enterprise-card">
+                        <div class="card-icon">📈</div>
+                        <h3>Scalable Architecture</h3>
+                        <p>Handle millions of concurrent interactions with auto-scaling infrastructure</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Testimonials Section -->
-        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 40px;">
+        <section style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 80px 40px;">
             <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; color: white; font-weight: 800;">What Our Customers Say</h2>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; margin-top: 60px;">
@@ -589,7 +2008,7 @@
 
         <!-- FAQ Section -->
         <section style="background: white; padding: 80px 40px;">
-            <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800;">Frequently Asked Questions</h2>
+            <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800;">Frequently Asked Questions</h2>
             <div style="max-width: 1000px; margin: 0 auto; margin-top: 60px;">
                 <div onclick="toggleFAQ(this)" style="margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; cursor: pointer;">
                     <div style="padding: 20px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #333; transition: all 0.3s;">
@@ -653,11 +2072,64 @@
             </div>
         </section>
 
+        <!-- Pricing Section -->
+        <section style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 80px 40px;">
+            <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800;">Simple, Transparent Pricing</h2>
+            <p style="text-align: center; color: #666; font-size: 16px; margin-bottom: 60px;">Choose the plan that fits your needs. All plans include our core features.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
+                <div style="background: white; padding: 40px; border-radius: 16px; border: 2px solid #e5e7eb; text-align: center; position: relative; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+                    <h3 style="font-size: 24px; margin-bottom: 10px; color: #333; font-weight: 700;">Starter</h3>
+                    <div style="font-size: 48px; font-weight: 800; color: var(--primary); margin-bottom: 10px;">$29<span style="font-size: 24px; font-weight: 600;">/month</span></div>
+                    <p style="color: #666; margin-bottom: 30px;">Perfect for small teams and startups</p>
+                    <ul style="text-align: left; color: #666; margin-bottom: 30px;">
+                        <li style="margin-bottom: 10px;">✓ 5 AI Avatars</li>
+                        <li style="margin-bottom: 10px;">✓ 100 hours of video generation</li>
+                        <li style="margin-bottom: 10px;">✓ Basic voice synthesis</li>
+                        <li style="margin-bottom: 10px;">✓ Email support</li>
+                        <li style="margin-bottom: 10px;">✓ API access</li>
+                    </ul>
+                    <button style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">Get Started</button>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 16px; border: 2px solid #667eea; text-align: center; position: relative; transition: all 0.3s; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15); transform: scale(1.05);">
+                    <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 8px 20px; border-radius: 20px; font-weight: 600; font-size: 14px;">Most Popular</div>
+                    <h3 style="font-size: 24px; margin-bottom: 10px; color: #333; font-weight: 700;">Professional</h3>
+                    <div style="font-size: 48px; font-weight: 800; color: var(--primary); margin-bottom: 10px;">$99<span style="font-size: 24px; font-weight: 600;">/month</span></div>
+                    <p style="color: #666; margin-bottom: 30px;">Ideal for growing businesses</p>
+                    <ul style="text-align: left; color: #666; margin-bottom: 30px;">
+                        <li style="margin-bottom: 10px;">✓ 25 AI Avatars</li>
+                        <li style="margin-bottom: 10px;">✓ 500 hours of video generation</li>
+                        <li style="margin-bottom: 10px;">✓ Advanced voice synthesis</li>
+                        <li style="margin-bottom: 10px;">✓ Priority support</li>
+                        <li style="margin-bottom: 10px;">✓ Custom integrations</li>
+                        <li style="margin-bottom: 10px;">✓ Analytics dashboard</li>
+                    </ul>
+                    <button style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">Get Started</button>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 16px; border: 2px solid #e5e7eb; text-align: center; position: relative; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+                    <h3 style="font-size: 24px; margin-bottom: 10px; color: #333; font-weight: 700;">Enterprise</h3>
+                    <div style="font-size: 48px; font-weight: 800; color: var(--primary); margin-bottom: 10px;">Custom</div>
+                    <p style="color: #666; margin-bottom: 30px;">For large organizations with custom needs</p>
+                    <ul style="text-align: left; color: #666; margin-bottom: 30px;">
+                        <li style="margin-bottom: 10px;">✓ Unlimited AI Avatars</li>
+                        <li style="margin-bottom: 10px;">✓ Unlimited video generation</li>
+                        <li style="margin-bottom: 10px;">✓ Premium voice synthesis</li>
+                        <li style="margin-bottom: 10px;">✓ 24/7 dedicated support</li>
+                        <li style="margin-bottom: 10px;">✓ White-label solution</li>
+                        <li style="margin-bottom: 10px;">✓ Custom development</li>
+                    </ul>
+                    <button style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">Contact Sales</button>
+                </div>
+            </div>
+        </section>
+
         <!-- CTA Section -->
-        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 40px; text-align: center;">
+        <section style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 80px 40px; text-align: center;">
             <h2 style="font-size: 48px; margin-bottom: 20px; font-weight: 800;">Ready to Transform Your Communication?</h2>
             <p style="font-size: 18px; margin-bottom: 40px; opacity: 0.95;">Join thousands of enterprise customers using Athena for real-time AI interactions</p>
-            <button onclick="openChatbot()" style="padding: 15px 40px; background: white; color: #667eea; border: none; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 16px; transition: all 0.3s;">Start Free Trial Today</button>
+            <button onclick="openChatbot()" style="padding: 15px 40px; background: white; color: var(--primary); border: none; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 16px; transition: all 0.3s;">Start Free Trial Today</button>
         </section>
     </main>
 
@@ -668,7 +2140,7 @@
     <div id="chatbotContainer" style="display: none;">
         <div>
             <!-- Avatar Panel -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.1);">
+            <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.1);">
                 <div style="position: absolute; top: -50%; right: -50%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
                 <div style="position: absolute; bottom: -30%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite; animation-delay: -2s;"></div>
                 
@@ -695,7 +2167,7 @@
 
             <!-- Chat Panel -->
             <div style="display: flex; flex-direction: column; background: linear-gradient(180deg, #ffffff 0%, #f8f9ff 100%); padding: 0; overflow: hidden;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
+                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15);">
                     <div style="font-size: 18px; font-weight: 700;">Live Chat Support</div>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <div id="sizePresets" style="display: flex; gap: 6px; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 20px;">
@@ -710,18 +2182,18 @@
                 </div>
 
                 <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: transparent; scroll-behavior: smooth; max-height: 100%;">
-                    <div style="text-align: center; color: #999; padding: 20px; font-size: 13px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 16px; border: 1px solid rgba(102, 126, 234, 0.1);">
+                    <div style="text-align: center; color: #999; padding: 20px; font-size: 13px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%); border-radius: 16px; border: 1px solid rgba(6, 182, 212, 0.1);">
                         👋 Welcome! I'm Ambassador Paul. Ask me anything! 🎤 Voice enabled!
                     </div>
                 </div>
 
-                <div style="padding: 16px; border-top: 1px solid rgba(102, 126, 234, 0.08); background: white; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; position: relative; z-index: 100;">
-                    <div style="flex: 1; display: flex; align-items: center; background: linear-gradient(135deg, #f8fafc 0%, #faf8ff 100%); border: 2px solid rgba(102, 126, 234, 0.12); border-radius: 24px; padding: 12px 18px; transition: all 0.3s; pointer-events: auto; position: relative; z-index: 101;">
+                <div style="padding: 16px; border-top: 1px solid rgba(6, 182, 212, 0.08); background: white; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; position: relative; z-index: 100;">
+                    <div style="flex: 1; display: flex; align-items: center; background: linear-gradient(135deg, #f8fafc 0%, #faf8ff 100%); border: 2px solid rgba(6, 182, 212, 0.12); border-radius: 24px; padding: 12px 18px; transition: all 0.3s; pointer-events: auto; position: relative; z-index: 101;">
                         <input id="chatInput" type="text" placeholder="Type or speak..." style="flex: 1; border: none; outline: none; font-size: 14px; background: transparent; color: #333; font-family: inherit; position: relative; z-index: 102; pointer-events: auto;" autocomplete="off">
                     </div>
-                    <button id="chatSendBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); font-weight: bold; position: relative; z-index: 101;" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'">📤</button>
+                    <button id="chatSendBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); font-weight: bold; position: relative; z-index: 101;" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(6, 182, 212, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(6, 182, 212, 0.3)'">📤</button>
                     <div style="position: relative; z-index: 101;">
-                        <button id="chatMicBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; animation: micReady 2s ease-in-out infinite; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'">🎙️</button>
+                        <button id="chatMicBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; animation: micReady 2s ease-in-out infinite; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(6, 182, 212, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(6, 182, 212, 0.3)'">🎙️</button>
                         <div style="position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: #22c55e; border-radius: 50%; border: 2px solid white; animation: readyPulse 1.5s ease-in-out infinite; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);"></div>
                     </div>
                 </div>
@@ -740,8 +2212,67 @@
     </div>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 Athena AI - Enterprise AI Avatar Platform</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>QUICK LINKS</h4>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#integrations">Integrations</a>
+                <a href="#enterprise">Enterprise</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>RESOURCES</h4>
+                <a href="#docs">Documentation</a>
+                <a href="#api">API Reference</a>
+                <a href="#support">Support</a>
+                <a href="#blog">Blog</a>
+                <a href="#case-studies">Case Studies</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>POWERED BY ATHENA</h4>
+                <a href="#studio">Athena Studio</a>
+                <a href="#connect">Athena Connect</a>
+                <a href="#workforce">Digital Workforce</a>
+                <a href="#avatars">AI Avatars</a>
+                <a href="#platform">Platform</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>COMPANY</h4>
+                <a href="#about">About</a>
+                <a href="#careers">Careers</a>
+                <a href="#press">Press</a>
+                <a href="#partners">Partners</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>FOLLOW US</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">💼</a>
+                    <a href="#" class="social-link">📺</a>
+                    <a href="#" class="social-link">✍️</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; 2026 Athena AI - Enterprise AI Avatar Platform</p>
+                <div class="footer-links">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#security">Security</a>
+                    <a href="#compliance">Compliance</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script>
@@ -1165,7 +2696,7 @@ Always respond directly to the user's question with accurate information. Be con
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typingMsg';
             typingDiv.style.cssText = 'display: flex; justify-content: flex-start; gap: 8px; animation: messageSlide 0.4s ease;';
-            typingDiv.innerHTML = '<div class="bot-avatar">🤖</div><div style="display: flex; gap: 5px; padding: 12px 18px; background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%); border-radius: 18px 18px 18px 4px; border: 1px solid rgba(102, 126, 234, 0.1);"><div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typing 1.4s infinite;"></div><div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.2s;"></div><div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.4s;"></div></div>';
+            typingDiv.innerHTML = '<div class="bot-avatar">🤖</div><div style="display: flex; gap: 5px; padding: 12px 18px; background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%); border-radius: 18px 18px 18px 4px; border: 1px solid rgba(6, 182, 212, 0.1);"><div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: typing 1.4s infinite;"></div><div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.2s;"></div><div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.4s;"></div></div>';
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -1240,6 +2771,147 @@ Always respond directly to the user's question with accurate information. Be con
         // API Setup Button
         const apiSetupBtn = document.getElementById('apiSetupBtn');
         apiSetupBtn.addEventListener('click', setupGoogleAPI);
+
+        // Authentication Functions
+        function showLogin() {
+            // Create login modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                backdrop-filter: blur(10px);
+            `;
+            
+            const loginForm = document.createElement('div');
+            loginForm.style.cssText = `
+                background: rgba(15, 15, 35, 0.95);
+                padding: 2rem;
+                border-radius: 1rem;
+                border: 1px solid rgba(6, 182, 212, 0.2);
+                backdrop-filter: blur(20px);
+                min-width: 400px;
+            `;
+            
+            loginForm.innerHTML = `
+                <h2 style="color: white; margin-bottom: 1.5rem; text-align: center;">Login to Athena AI</h2>
+                <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; color: white; outline: none;">
+                <input type="password" id="loginPassword" placeholder="Password" style="width: 100%; padding: 0.75rem; margin-bottom: 1.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; color: white; outline: none;">
+                <button onclick="performLogin()" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Login</button>
+                <button onclick="closeModal()" style="width: 100%; padding: 0.75rem; background: transparent; color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; cursor: pointer; margin-top: 0.5rem;">Cancel</button>
+            `;
+            
+            modal.appendChild(loginForm);
+            document.body.appendChild(modal);
+        }
+
+        function googleSignIn() {
+            // Google Sign-In implementation
+            if (window.google && window.google.accounts) {
+                window.google.accounts.id2.initialize({
+                    client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your actual Google Client ID
+                    callback: handleGoogleSignIn,
+                    auto_select: false,
+                    ux_mode: 'popup'
+                });
+                
+                window.google.accounts.id2.prompt();
+            } else {
+                // Fallback if Google Sign-In is not loaded
+                alert('Google Sign-In is not available. Please contact support.');
+            }
+        }
+
+        function handleGoogleSignIn(response) {
+            // Handle Google Sign-In response
+            const profile = response.getBasicProfile();
+            const user = {
+                name: profile.getName(),
+                email: profile.getEmail(),
+                avatar: profile.getImageUrl(),
+                token: response.getAuthResponse().id_token
+            };
+            
+            // Store user info
+            localStorage.setItem('user', JSON.stringify(user));
+            showUserInfo(user);
+            
+            // Close any open modals
+            const modals = document.querySelectorAll('[style*="position: fixed"]');
+            modals.forEach(modal => modal.remove());
+        }
+
+        function performLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simple validation
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            // Simulate login (in real app, this would be an API call)
+            const user = {
+                name: email.split('@')[0],
+                email: email,
+                avatar: `https://ui-avatars.com/api/?name=${email}&background=8b5cf6&color=ffffff`,
+                token: 'mock_token_' + Date.now()
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            showUserInfo(user);
+            
+            // Close modal
+            const modals = document.querySelectorAll('[style*="position: fixed"]');
+            modals.forEach(modal => modal.remove());
+        }
+
+        function showUserInfo(user) {
+            const userInfo = document.getElementById('userInfo');
+            const authButtons = document.querySelector('.auth-buttons');
+            
+            if (userInfo && authButtons) {
+                document.querySelector('.user-avatar').src = user.avatar;
+                document.querySelector('.user-name').textContent = user.name;
+                
+                userInfo.style.display = 'flex';
+                authButtons.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            location.reload();
+        }
+
+        function closeModal() {
+            const modals = document.querySelectorAll('[style*="position: fixed"]');
+            modals.forEach(modal => modal.remove());
+        }
+
+        // Check if user is already logged in
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                showUserInfo(user);
+            }
+        });
+
+        // Add Google Sign-In script
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
         apiSetupBtn.addEventListener('mouseover', function() {
             this.style.background = 'rgba(255, 255, 255, 0.4)';
             this.style.transform = 'scale(1.1)';
