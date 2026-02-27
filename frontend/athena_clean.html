@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena - Enterprise AI Avatar Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #333333;
+            line-height: 1.6;
+            background: #ffffff;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        main {
+            margin-top: 70px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            padding: 100px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 15px 40px;
+            background: white;
+            color: #2563eb;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 80px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666666;
+        }
+
+        /* Footer */
+        footer {
+            background: #f8f9fa;
+            color: #333333;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        /* AI Avatar Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-container.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        .avatar-video-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .video-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px;
+            border-radius: 15px;
+        }
+
+        .control-btn {
+            width: 25px;
+            height: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .chatbot-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            max-width: 85%;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #f1f5f9;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-input-field:focus {
+            border-color: #2563eb;
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .floating-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">📚 ATHENA AI</div>
+        <button class="cta-btn">Get Started</button>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 style="font-size: 56px; margin-bottom: 20px; font-weight: 800;">Athena AI Platform</h1>
+            <p style="font-size: 20px; margin-bottom: 30px; opacity: 0.9;">Transform your communication with photorealistic AI avatars that understand, respond, and engage naturally</p>
+            <div class="hero-buttons">
+                <button class="btn-primary">Start Free Trial</button>
+                <button class="btn-primary" style="background: transparent; border: 2px solid white; color: white;">Watch Demo</button>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎤</div>
+                <h3>Real-Time Voice Input</h3>
+                <p>Speak naturally and let our speech-to-text technology understand you instantly</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔊</div>
+                <h3>Natural Voice Output</h3>
+                <p>Get responses spoken with human-like voice powered by neural technology</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎭</div>
+                <h3>Photorealistic Avatars</h3>
+                <p>Meet lifelike AI avatars that create engaging face-to-face conversations</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Multi-Language Support</h3>
+                <p>Communicate in any language with seamless translation</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Enterprise Security</h3>
+                <p>Bank-level encryption and GDPR, HIPAA compliance</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Sub-second Latency</h3>
+                <p>Experience near-instantaneous responses</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Athena AI - Enterprise AI Avatar Platform</p>
+    </footer>
+
+    <!-- AI Avatar Chatbot -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="avatar-container">
+                <div class="avatar-video-container" id="avatarContainer">
+                    <div class="avatar-image">🤖</div>
+                    <div class="video-controls">
+                        <button class="control-btn" id="videoBtn" title="Toggle Video">📹</button>
+                        <button class="control-btn" id="audioBtn" title="Toggle Audio">🎤</button>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; font-size: 16px;">Athena AI Assistant</div>
+                    <div style="font-size: 12px; opacity: 0.8;" id="statusText">Text Mode • Audio On</div>
+                </div>
+            </div>
+            <button class="close-btn" id="closeBtn">✕</button>
+        </div>
+        
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="message-container">
+                <div class="avatar-image" style="width: 40px; height: 40px; font-size: 18px;">🤖</div>
+                <div class="bot-message">Hello! I'm Athena, your AI assistant. How can I help you today?</div>
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" class="chat-input-field" id="chatInput" placeholder="Type your message...">
+            <button class="send-btn" id="sendBtn">➤</button>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button class="floating-chat-btn" id="floatingBtn">💬</button>
+
+    <script>
+        // Chatbot State Management
+        let isChatOpen = false;
+        let isVideoEnabled = false;
+        let isAudioEnabled = true;
+        let messages = [
+            { type: 'bot', text: 'Hello! I\'m Athena, your AI assistant. How can I help you today?' }
+        ];
+
+        // DOM Elements
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const floatingBtn = document.getElementById('floatingBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatbotBody = document.getElementById('chatbotBody');
+        const videoBtn = document.getElementById('videoBtn');
+        const audioBtn = document.getElementById('audioBtn');
+        const statusText = document.getElementById('statusText');
+        const avatarContainer = document.getElementById('avatarContainer');
+
+        // Python Backend API Integration
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // Event Listeners
+        floatingBtn.addEventListener('click', toggleChat);
+        closeBtn.addEventListener('click', closeChat);
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        videoBtn.addEventListener('click', toggleVideo);
+        audioBtn.addEventListener('click', toggleAudio);
+
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            chatbotContainer.classList.toggle('active', isChatOpen);
+            if (isChatOpen) {
+                chatInput.focus();
+            }
+        }
+
+        function closeChat() {
+            isChatOpen = false;
+            chatbotContainer.classList.remove('active');
+        }
+
+        function toggleVideo() {
+            isVideoEnabled = !isVideoEnabled;
+            updateAvatarDisplay();
+            updateStatus();
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            updateStatus();
+        }
+
+        function updateAvatarDisplay() {
+            if (isVideoEnabled) {
+                avatarContainer.innerHTML = `
+                    <video class="video-avatar" autoplay muted loop>
+                        <source src="videos/avatar-video.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-controls">
+                        <button class="control-btn" id="videoBtn" onclick="toggleVideo()">📹</button>
+                        <button class="control-btn" id="audioBtn" onclick="toggleAudio()">🎤</button>
+                    </div>
+                `;
+            } else {
+                avatarContainer.innerHTML = `
+                    <div class="avatar-image">🤖</div>
+                    <div class="video-controls">
+                        <button class="control-btn" id="videoBtn" onclick="toggleVideo()">📹</button>
+                        <button class="control-btn" id="audioBtn" onclick="toggleAudio()">🎤</button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStatus() {
+            const mode = isVideoEnabled ? 'Video Mode' : 'Text Mode';
+            const audio = isAudioEnabled ? 'Audio On' : 'Audio Off';
+            statusText.textContent = `${mode} • ${audio}`;
+        }
+
+        async function callPythonBackend(message) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        video_enabled: isVideoEnabled,
+                        audio_enabled: isAudioEnabled
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.message || data.response;
+                }
+            } catch (error) {
+                console.log('Python backend not available, using fallback');
+            }
+            return null;
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage('user', message);
+            chatInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Try Python backend first
+            const botResponse = await callPythonBackend(message);
+            
+            // Add bot response
+            setTimeout(() => {
+                hideTypingIndicator();
+                
+                let responseText;
+                if (botResponse) {
+                    responseText = botResponse;
+                } else {
+                    responseText = getFallbackResponse(message);
+                }
+                
+                addMessage('bot', responseText);
+            }, botResponse ? 500 : 1500);
+        }
+
+        function addMessage(type, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-container';
+            messageDiv.style.marginLeft = type === 'user' ? 'auto' : '';
+            
+            if (type === 'bot') {
+                messageDiv.innerHTML = `
+                    <div class="avatar-image" style="width: 40px; height: 40px; font-size: 18px;">🤖</div>
+                    <div class="bot-message">${text}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="user-message">${text}</div>
+                `;
+            }
+            
+            chatbotBody.appendChild(messageDiv);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message-container';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="avatar-image" style="width: 40px; height: 40px; font-size: 18px;">🤖</div>
+                <div class="bot-message">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatbotBody.appendChild(typingDiv);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function getFallbackResponse(message) {
+            const messageLower = message.toLowerCase();
+            
+            const responses = {
+                'hello': 'Hello! I\'m Athena, your AI assistant. How can I help you today?',
+                'hi': 'Hi there! I\'m here to assist you with any questions about our AI platform.',
+                'help': 'I can help you with information about Athena AI, our features, pricing, and technical support.',
+                'features': 'Athena AI offers: Real-time voice input, Natural voice output, Photorealistic avatars, Multi-language support, Enterprise security, and Sub-second latency.',
+                'pricing': 'We offer flexible pricing plans: Basic ($99/month), Professional ($299/month), and Enterprise (custom pricing).',
+                'demo': 'Click the video button to enable video mode, and I\'ll demonstrate our avatar capabilities!',
+                'avatar': 'Our AI avatars are photorealistic, responsive, and can be customized to match your brand.',
+                'default': 'That\'s interesting! How can I help you learn more about Athena AI?'
+            };
+            
+            for (const [keyword, response] of Object.entries(responses)) {
+                if (keyword !== 'default' && messageLower.includes(keyword)) {
+                    return response;
+                }
+            }
+            
+            if (messageLower.includes('video') || messageLower.includes('avatar')) {
+                return isVideoEnabled ? 
+                    'I see you have video enabled! Our AI avatars can provide visual responses with natural expressions.' :
+                    'Click the video button to enable video mode, and I can show you our avatar capabilities!';
+            }
+            
+            return responses.default;
+        }
+    </script>
+</body>
+</html>
