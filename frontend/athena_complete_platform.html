@@ -1393,6 +1393,81 @@
             </div>
         </section>
 
+        <!-- Capabilities / Why Athena Section -->
+        <style>
+        /* Capabilities section styles */
+        .capabilities { max-width:1180px; margin: 60px auto; padding: 40px 20px; color: #e6f8ff }
+        .cap-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:22px; align-items:start }
+        .cap-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.03) }
+        .cap-header { height:70px; display:flex; align-items:center; padding:12px; border-radius:8px; font-weight:800; font-size:20px; }
+        .cap-header.canvas{ background:#e9ffec; color:#082f0f }
+        .cap-header.studio{ background:#feecee; color:#2e0b06 }
+        .cap-header.jasper{ background:#dff2ff; color:#05294a }
+        .cap-header.trust{ background:#fff7c9; color:#2f2a00 }
+        .cap-icon { font-size:48px; display:block; text-align:center; padding:18px 0 }
+        .cap-desc { margin-top:14px; padding:18px; background: rgba(255,255,255,0.02); border-radius:8px; display:flex; justify-content:space-between; align-items:center }
+        .cap-desc p { margin:0; color:#cfefff }
+        .cap-desc .arrow { font-weight:800; font-size:20px; color:var(--accent-a) }
+
+        .why-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:18px; margin-top:28px }
+        .why-card { background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); min-height:120px }
+        .why-card h4 { margin:0 0 8px 0; color:#eaffff }
+        .why-card p { margin:0; color:#cfefff }
+
+        @media (max-width: 1000px){ .cap-grid, .why-grid { grid-template-columns: repeat(2,1fr) } }
+        @media (max-width: 640px){ .cap-grid, .why-grid { grid-template-columns: 1fr } .cap-header{font-size:18px} }
+        </style>
+
+        <section id="capabilities" class="section capabilities">
+            <div class="cap-grid">
+                <div class="cap-card">
+                    <div class="cap-header canvas">🔊 Real-Time Voice Processing</div>
+                    <div class="cap-icon">🎧</div>
+                    <div class="cap-desc"><p>Low-latency streaming audio with smart buffering, noise handling, and VAD tuned for live conversation.</p><div class="arrow">→</div></div>
+                </div>
+
+                <div class="cap-card">
+                    <div class="cap-header studio">🧠 AI Chat Intelligence</div>
+                    <div class="cap-icon">🤖</div>
+                    <div class="cap-desc"><p>LLM-powered reasoning, grounding, and tool-calling for complex multi-turn dialogs and workflows.</p><div class="arrow">→</div></div>
+                </div>
+
+                <div class="cap-card">
+                    <div class="cap-header jasper">🎮 Unreal Engine Integration</div>
+                    <div class="cap-icon">🕹️</div>
+                    <div class="cap-desc"><p>Drive cinematic digital humans with real-time animation curves, blendshapes, and scene orchestration.</p><div class="arrow">→</div></div>
+                </div>
+
+                <div class="cap-card">
+                    <div class="cap-header trust">👄 Ultra-Accurate Lip Sync</div>
+                    <div class="cap-icon">👄</div>
+                    <div class="cap-desc"><p>Phoneme-precise viseme mapping and timing, tuned for expressive speech and multilingual delivery.</p><div class="arrow">→</div></div>
+                </div>
+            </div>
+
+            <div class="why-grid">
+                <div class="why-card">
+                    <h4>Built for Real-Time, At Scale</h4>
+                    <p>Under 150ms glass-to-glass latency, modular components, and fleet-ready orchestration.</p>
+                </div>
+
+                <div class="why-card">
+                    <h4>⚡ Ultra-Low Latency (&lt;150ms)</h4>
+                    <p>End-to-end optimization from audio ingress to 3D render, designed for natural back-and-forth.</p>
+                </div>
+
+                <div class="why-card">
+                    <h4>🧬 Modular AI Pipeline</h4>
+                    <p>Swap STT, TTS, or LLM while maintaining unified orchestration and observability.</p>
+                </div>
+
+                <div class="why-card">
+                    <h4>🌍 Multi-Avatar System Support</h4>
+                    <p>Manage entire casts of avatars across products, brands, and languages from a single control plane.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- CTA Section -->
         <section style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 153, 255, 0.1) 100%); color: white; padding: 80px 40px; text-align: center; border-top: 2px solid rgba(0, 217, 255, 0.4); border-bottom: 2px solid rgba(0, 217, 255, 0.4);">
             <h2 style="font-size: 48px; margin-bottom: 20px; font-weight: 800; background: linear-gradient(120deg, #00ffff, #00d9ff, #0099ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Ready to Transform Your Communication?</h2>
