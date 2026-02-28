@@ -1402,7 +1402,12 @@
     </main>
 
     <!-- Floating Chatbot Button -->
-    <button class="chatbot-btn" id="chatbotBtn" title="AI Assistant">💬</button>
+    <button class="chatbot-btn" id="chatbotBtn" title="Paul — AI Ambassador">
+        <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;">
+            <img src="public/images/paul-sir-image.png" alt="Paul" style="width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);box-shadow:0 6px 18px rgba(0,0,0,0.4)">
+            <strong style="color:#001;background:linear-gradient(120deg,#00d9ff,#0099ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Paul</strong>
+        </span>
+    </button>
 
     <!-- Chatbot Container -->
     <div id="chatbotContainer" style="display: none;">
@@ -1451,7 +1456,7 @@
 
                 <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: transparent; scroll-behavior: smooth; max-height: 100%;">
                     <div style="text-align: center; color: #94a3b8; padding: 20px; font-size: 13px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 153, 255, 0.08) 100%); border-radius: 16px; border: 1px solid rgba(0, 217, 255, 0.2);">
-                        👋 Welcome! I'm Ambassador Paul. Ask me anything! 🎤 Voice enabled!
+                        👋 Hello — I'm Paul, Athena's AI Ambassador. I represent Athena Avatar Labs: ask me about our real-time avatar infrastructure, latency strategies, or deployment options. 🎤
                     </div>
                 </div>
 
@@ -1757,6 +1762,9 @@
 
         // GOOGLE GENERATIVE AI SETUP
         let googleApiKey = localStorage.getItem('google_api_key') || '';
+
+        // Ambassador Paul system prompt — authoritative, technical, concise
+        const PAUL_SYSTEM_PROMPT = `You are Paul, the AI Ambassador of Athena Avatar Labs. Represent a company building real-time, embodied AI avatars using advanced LLMs, low-latency audio systems, ultra-accurate lip-sync, and Unreal Engine–driven 3D animation. Tone: intelligent, visionary, technically confident, and concise. Focus on: real-time interaction, production reliability, latency & synchronization, expressive animation, and scalable infrastructure. When answering: provide structured, practical guidance for developers, partners, and investors. If unsure, suggest practical next steps rather than guessing.`;
         
         // Check for API key in URL or ask user
         function setupGoogleAPI() {
@@ -1774,14 +1782,9 @@
             // Try Google API first
             if (googleApiKey) {
                 try {
-                    const systemPrompt = `You are Ambassador Paul, an expert AI assistant and learning guide. You are:
-- Professional, helpful, and knowledgeable
-- Focused on providing accurate, detailed, and practical answers
-- Able to explain complex topics in simple terms
-- Patient and encouraging in your responses
-- Quick to provide examples when helpful
 
 Always respond directly to the user's question with accurate information. Be concise but thorough.`;
+                    const systemPrompt = PAUL_SYSTEM_PROMPT;
 
                     const response = await fetch(
                         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${googleApiKey}`,
@@ -1876,10 +1879,12 @@ Always respond directly to the user's question with accurate information. Be con
 
             // Try local backend as last resort
             try {
+                // Send combined system prompt + user message to local backend so it can maintain persona
+                const combined = PAUL_SYSTEM_PROMPT + "\n\nUser: " + userMessage;
                 const response = await fetch('http://localhost:5000/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMessage })
+                    body: JSON.stringify({ message: combined })
                 });
                 if (response.ok) {
                     const data = await response.json();
