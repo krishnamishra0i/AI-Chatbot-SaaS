@@ -13,12 +13,52 @@
 
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            color: #f0f9ff;
+            color: var(--text-primary, #1a3a2f);
             line-height: 1.6;
-            background: linear-gradient(180deg, #0a0e27 0%, #0d1829 40%, #000000 100%);
+            background: linear-gradient(180deg, #f0fff4 0%, #e6ffed 40%, #dcffe4 100%);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+        }
+
+        /* Sci-Fi Color Variables */
+        :root {
+            --bg-primary: #f0fff4;
+            --bg-secondary: #e6ffed;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --accent-coral: #fb7185;
+            --text-primary: #1a3a2f;
+            --text-secondary: #3d5a4f;
+            --sentence-color: var(--text-primary);
+            --glow-green: rgba(16, 185, 129, 0.6);
+            --glow-pink: rgba(236, 72, 153, 0.5);
+            --glow-orange: rgba(249, 115, 22, 0.5);
+        }
+
+        /* Living Orb Animations */
+        @keyframes orbBreathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--glow-green), 0 0 60px var(--glow-pink); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px var(--glow-green), 0 0 80px var(--glow-pink), 0 0 100px var(--glow-orange); }
+        }
+        @keyframes orbPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        @keyframes orbRing {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes waveformBar {
+            0%, 100% { height: 4px; }
+            50% { height: 18px; }
+        }
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         nav {
@@ -30,12 +70,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: radial-gradient(circle at top left, rgba(0, 217, 255, 0.08), transparent 55%),
-                        rgba(11, 15, 25, 0.98);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.95),
-                        0 0 40px rgba(0, 217, 255, 0.2);
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(3,102,153,0.08);
+            box-shadow: 0 6px 18px rgba(3,32,56,0.06);
             z-index: 1000;
         }
 
@@ -47,11 +85,10 @@
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            background: linear-gradient(120deg, #00d9ff, #0099ff, #00ffff);
+            background: linear-gradient(120deg, #036b8a, #0274a6);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(0, 217, 255, 1)) drop-shadow(0 0 40px rgba(0, 153, 255, 0.8));
         }
 
         .logo span {
@@ -61,18 +98,16 @@
 
         .cta-btn {
             padding: 9px 22px;
-            background: linear-gradient(120deg, #0099ff, #00d9ff, #00ffff);
-            color: #000;
-            border: 2px solid #00ffff;
+            background: linear-gradient(120deg, #0284c7, #06b6d4);
+            color: #fff;
+            border: 1px solid rgba(2,132,199,0.15);
             border-radius: 999px;
             cursor: pointer;
             font-weight: 700;
             font-size: 13px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.9),
-                        0 0 40px rgba(0, 153, 255, 0.7),
-                        0 18px 40px rgba(0, 217, 255, 0.6);
+            box-shadow: 0 6px 18px rgba(3,32,56,0.08);
             transition: all 0.22s ease;
         }
 
@@ -93,11 +128,9 @@
             font-size: 56px;
             line-height: 1.1;
             margin-bottom: 20px;
-            background: linear-gradient(120deg, #00ffff, #00d9ff, #0099ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.8)) drop-shadow(0 0 60px rgba(0, 153, 255, 0.6));
+            color: #03263b;
+            -webkit-text-fill-color: initial;
+            text-shadow: 0 2px 6px rgba(2,32,56,0.06);
         }
 
         .hero-buttons {
@@ -124,24 +157,18 @@
         }
 
         .feature-card {
-            background: radial-gradient(circle at top left, rgba(0, 217, 255, 0.15), transparent 65%),
-                        rgba(5, 15, 35, 0.96);
+            background: linear-gradient(180deg, #ffffff, #f7fbff);
             border-radius: 20px;
-            padding: 30px;
-            border: 2px solid rgba(0, 217, 255, 0.6);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5),
-                        0 0 40px rgba(0, 153, 255, 0.3),
-                        0 20px 55px rgba(0, 153, 255, 0.2);
-            backdrop-filter: blur(18px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            padding: 28px;
+            border: 1px solid rgba(3, 32, 56, 0.06);
+            box-shadow: 0 10px 30px rgba(3, 32, 56, 0.06);
+            transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-6px);
-            border-color: rgba(0, 255, 255, 1);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8),
-                        0 0 60px rgba(0, 153, 255, 0.6),
-                        0 24px 70px rgba(0, 217, 255, 0.5);
+            border-color: rgba(3, 32, 56, 0.12);
+            box-shadow: 0 20px 50px rgba(3, 32, 56, 0.08);
         }
 
         .feature-icon {
@@ -152,12 +179,12 @@
         .feature-card h3 {
             font-size: 18px;
             margin-bottom: 10px;
-            color: #e0e7ff;
+            color: #03263b;
         }
 
         .feature-card p {
             font-size: 14px;
-            color: #cbd5e1;
+            color: #274556;
         }
 
         footer {
@@ -193,44 +220,106 @@
             color: #00d9ff;
         }
 
+        /* Living Presence Orb */
         .chatbot-btn {
             position: fixed;
-            bottom: 70px;
-            right: 20px;
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #0099ff, #00d9ff);
-            border: 2px solid rgba(0, 255, 255, 0.8);
+            bottom: 30px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-pink), var(--accent-orange));
+            background-size: 300% 300%;
+            animation: gradientFlow 4s ease infinite, orbBreathe 6s ease-in-out infinite;
+            border: none;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.9),
-                        0 0 60px rgba(0, 153, 255, 0.7);
-            transition: all 0.3s ease;
+            gap: 4px;
+            box-shadow: 0 0 40px var(--glow-green), 0 0 80px var(--glow-pink);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             z-index: 999;
+            overflow: visible;
         }
-
+        .chatbot-btn::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            opacity: 0.6;
+            animation: orbPulse 3s ease-in-out infinite;
+        }
+        .chatbot-btn::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid var(--accent-pink);
+            animation: orbRing 4s ease-out infinite;
+        }
         .chatbot-btn:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 50px rgba(0, 255, 255, 1),
-                        0 0 80px rgba(0, 153, 255, 0.9);
+            transform: scale(1.15);
+            box-shadow: 0 0 60px var(--glow-green), 0 0 100px var(--glow-pink), 0 0 120px var(--glow-orange);
         }
+        .chatbot-btn .orb-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            letter-spacing: 0.05em;
+        }
+        .chatbot-btn .orb-latency {
+            font-size: 9px;
+            color: rgba(255,255,255,0.9);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .chatbot-btn:hover .orb-latency {
+            opacity: 1;
+        }
+        /* Waveform ring around orb */
+        .orb-waveform {
+            position: absolute;
+            bottom: -12px;
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+        }
+        .orb-waveform span {
+            width: 3px;
+            height: 4px;
+            background: #fff;
+            border-radius: 2px;
+            animation: waveformBar 0.8s ease-in-out infinite;
+        }
+        .orb-waveform span:nth-child(1) { animation-delay: 0s; }
+        .orb-waveform span:nth-child(2) { animation-delay: 0.1s; }
+        .orb-waveform span:nth-child(3) { animation-delay: 0.2s; }
+        .orb-waveform span:nth-child(4) { animation-delay: 0.3s; }
+        .orb-waveform span:nth-child(5) { animation-delay: 0.15s; }
 
         #chatbotContainer {
             position: fixed;
-            bottom: 100px;
-            right: 20px;
-            width: 620px;
-            height: 700px;
+            bottom: 130px;
+            right: 30px;
+            width: 420px;
+            height: 600px;
             z-index: 998;
-            border-radius: 24px;
-            box-shadow: 0 0 40px rgba(0, 217, 255, 0.8),
-                        0 0 80px rgba(0, 153, 255, 0.6);
-            border: 2px solid rgba(0, 217, 255, 0.7);
+            border-radius: 28px;
+            background: linear-gradient(180deg, #0a1f18 0%, #0d2520 100%);
+            box-shadow: 0 0 60px var(--glow-green), 0 30px 80px rgba(0,0,0,0.4);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             display: none;
+            overflow: hidden;
+            transform-origin: bottom right;
+            animation: chatOpen 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes chatOpen {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .resize-handle {
@@ -274,13 +363,379 @@
         .resize-handle.lm { top: 50%; left: -10px; transform: translateY(-50%); }
         .resize-handle.rm { top: 50%; right: -10px; transform: translateY(-50%); }
 
+        /* Premium Chat UI Styles */
+        .chat-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #0d3d2e 0%, #0a2e22 100%);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar-mini {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+        .avatar-mini img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            object-fit: cover;
+        }
+        .avatar-mini .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border: 2px solid #0d3d2e;
+            border-radius: 50%;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #e6ffed;
+            letter-spacing: -0.01em;
+        }
+        .header-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .badge-realtime {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .badge-embodied {
+            background: rgba(236, 72, 153, 0.15);
+            color: var(--accent-pink);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .badge-online {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .chat-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .latency-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        .latency-label, .sync-label { color: #94a3b8; }
+        .latency-value { color: var(--accent-green); font-weight: 600; }
+        .latency-sep { color: #475569; }
+        .sync-value { color: #f97316; font-weight: 600; }
+        .header-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6ffed;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .header-btn.close-btn {
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        /* Color picker styles */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .color-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border: none;
+            padding: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+        .color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-input::-webkit-color-swatch { border: none; border-radius: 6px; }
+
+        /* Voice Mode Overlay */
+        .voice-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 30, 24, 0.95);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            backdrop-filter: blur(8px);
+        }
+        .voice-overlay.hidden { display: none; }
+        .voice-avatar-ring {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        .voice-avatar-ring img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--accent-green);
+            object-fit: cover;
+        }
+        .voice-ring-glow {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-pink);
+            animation: orbRing 2s ease-out infinite;
+        }
+        .voice-waveform-lg {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            height: 50px;
+        }
+        .voice-waveform-lg span {
+            width: 6px;
+            background: linear-gradient(180deg, var(--accent-green), var(--accent-pink));
+            border-radius: 3px;
+            animation: waveformBar 0.6s ease-in-out infinite;
+        }
+        .voice-waveform-lg span:nth-child(1) { animation-delay: 0s; height: 20px; }
+        .voice-waveform-lg span:nth-child(2) { animation-delay: 0.08s; height: 30px; }
+        .voice-waveform-lg span:nth-child(3) { animation-delay: 0.16s; height: 45px; }
+        .voice-waveform-lg span:nth-child(4) { animation-delay: 0.24s; height: 50px; }
+        .voice-waveform-lg span:nth-child(5) { animation-delay: 0.16s; height: 45px; }
+        .voice-waveform-lg span:nth-child(6) { animation-delay: 0.08s; height: 30px; }
+        .voice-waveform-lg span:nth-child(7) { animation-delay: 0s; height: 20px; }
+        .voice-status {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-green);
+            letter-spacing: 0.05em;
+        }
+        .voice-cancel-btn {
+            padding: 10px 28px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .voice-cancel-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* Smart Starter Prompts */
+        .starter-prompts {
+            padding: 20px;
+            text-align: center;
+        }
+        .starter-heading {
+            font-size: 13px;
+            color: #3d5a4f;
+            font-weight: 600;
+            margin-bottom: 14px;
+            letter-spacing: 0.02em;
+        }
+        .starter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .starter-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            background: white;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .starter-btn:hover {
+            border-color: var(--accent-green);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+            transform: translateY(-2px);
+        }
+        .starter-icon {
+            font-size: 18px;
+        }
+        .starter-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a3a2f;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+
+        /* Sentence color (use site custom color) */
+        p,
+        .sentence,
+        .starter-text,
+        .starter-heading,
+        .chat-messages,
+        .chat-messages *,
+        .bot-message > div:not(.bot-avatar),
+        .user-message > div,
+        .header-title,
+        .header-info,
+        .cap-desc p {
+            color: var(--sentence-color) !important;
+        }
+
+        /* Chat Input Area */
+        .chat-input-area {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            background: white;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f8fffe;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 24px;
+            padding: 10px 18px;
+            transition: all 0.2s;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        .input-wrapper input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+            color: #1a3a2f;
+            font-family: inherit;
+        }
+        .input-wrapper input::placeholder {
+            color: #94a3b8;
+        }
+        .action-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+        .send-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+        .mic-btn {
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+            color: white;
+            box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+        }
+        .mic-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
+        }
+        .mic-ready-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #22c55e;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes statusPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+        }
+
         #chatbotContainer > div {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #12172a 0%, #0d1420 100%);
+            background: linear-gradient(180deg, #f8fffe 0%, #f0fff4 100%);
             border-radius: 24px;
-            display: grid;
-            grid-template-columns: 0.7fr 1.3fr;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
@@ -290,43 +745,46 @@
         }
 
         .user-message > div {
-            background: linear-gradient(135deg, #0099ff, #00d9ff);
+            background: linear-gradient(135deg, var(--accent-green), #059669);
             color: white;
             padding: 12px 18px;
             border-radius: 18px 18px 4px 18px;
             max-width: 80%;
             word-wrap: break-word;
             font-size: 14px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
         }
 
         .bot-message {
             display: flex;
             justify-content: flex-start;
-            gap: 8px;
+            gap: 10px;
         }
 
         .bot-avatar {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0099ff, #00d9ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
+            overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid var(--accent-green);
+        }
+        .bot-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .bot-message > div {
-            background: linear-gradient(135deg, #0f172a 0%, #0a1220 100%);
-            color: #e0e7ff;
+        .bot-message > div:not(.bot-avatar) {
+            background: white;
+            color: #1a3a2f;
             padding: 12px 18px;
             border-radius: 18px 18px 18px 4px;
             max-width: 80%;
             word-wrap: break-word;
-            border: 1px solid rgba(0, 217, 255, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.2);
             font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         @keyframes float {
@@ -402,7 +860,7 @@
         }
 
         .section-subtitle {
-            color: #cbd5e1;
+            color: var(--text-secondary);
             max-width: 520px;
             font-size: 14px;
         }
@@ -550,7 +1008,7 @@
 
         .hero-subtitle {
             font-size: 15px;
-            color: #94a3b8;
+            color: var(--text-secondary);
             margin-bottom: 20px;
             line-height: 1.6;
         }
@@ -753,7 +1211,7 @@
 
         .demo-copy p {
             font-size: 14px;
-            color: #9ca3af;
+            color: var(--text-secondary);
             margin-bottom: 16px;
         }
 
@@ -831,7 +1289,7 @@
 
         .founder-copy p {
             font-size: 14px;
-            color: #9ca3af;
+            color: var(--text-secondary);
             margin-bottom: 14px;
         }
 
@@ -1029,19 +1487,22 @@
         }
         /* Footer styles - variables and animations for richer look */
         :root{
-            --accent-a: #00d9ff;
-            --accent-b: #0099ff;
-            --accent-c: #00ffff;
-            --footer-bg-1: #05060a;
-            --footer-bg-2: #071026;
-            --muted: #cbd5e1;
+            --accent-a: #06b6d4;
+            --accent-b: #0284c7;
+            --accent-c: #036b8a;
+            --footer-bg-1: #f7fbff;
+            --footer-bg-2: #eef7ff;
+            --muted: #475569;
+            --text-primary: #072238;
+            --text-secondary: #475569;
+            --card-bg: #ffffff;
         }
 
         .site-footer {
             background: linear-gradient(180deg,var(--footer-bg-1) 0%, var(--footer-bg-2) 100%);
-            color: var(--muted);
+            color: var(--text-secondary);
             padding: 48px 20px 140px;
-            border-top: 1px solid rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(3,32,56,0.06);
             position: relative;
         }
 
@@ -1076,17 +1537,17 @@
         .footer-brand .logo{ font-size:20px }
 
         .footer-cols { flex:2; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
-        .footer-col h4{ font-size:14px; font-weight:700; margin-bottom:12px; color:#e6fbff }
+        .footer-col h4{ font-size:14px; font-weight:700; margin-bottom:12px; color:var(--text-primary) }
         .footer-col ul{ list-style:none; padding:0; margin:0 }
-        .footer-col a{ color: #cfefff; text-decoration:none; display:block; margin-bottom:8px; opacity:0.92; transition: color .18s ease, transform .12s ease }
-        .footer-col a:hover{ color: #fff; transform: translateX(6px) }
+        .footer-col a{ color: var(--text-secondary); text-decoration:none; display:block; margin-bottom:8px; opacity:0.92; transition: color .18s ease, transform .12s ease }
+        .footer-col a:hover{ color: var(--accent-b); transform: translateX(6px) }
 
         .footer-bottom { max-width:1180px; margin: 32px auto 0; display:flex; justify-content:space-between; align-items:center; padding-top:18px; border-top:1px solid rgba(255,255,255,0.03); opacity:0.95 }
 
-        .cookie-bar{ position:fixed; left:20px; right:20px; bottom:20px; background: linear-gradient(180deg, rgba(6,8,18,0.96), rgba(4,6,12,0.98)); color:#dbeffe; padding:12px 18px; border-radius:999px; border:1px solid rgba(255,255,255,0.04); display:flex; gap:14px; align-items:center; justify-content:center; box-shadow:0 12px 40px rgba(2,6,20,0.7); z-index:1200; opacity:0; transform: translateY(20px); transition: opacity .36s ease, transform .36s cubic-bezier(.2,.8,.2,1) }
+        .cookie-bar{ position:fixed; left:20px; right:20px; bottom:20px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,249,255,0.95)); color:var(--text-primary); padding:12px 18px; border-radius:999px; border:1px solid rgba(3,32,56,0.06); display:flex; gap:14px; align-items:center; justify-content:center; box-shadow:0 12px 40px rgba(3,32,56,0.06); z-index:1200; opacity:0; transform: translateY(20px); transition: opacity .36s ease, transform .36s cubic-bezier(.2,.8,.2,1) }
         .cookie-bar.show{ opacity:1; transform: translateY(0) }
-        .cookie-bar a{ color:#e9fbff; text-decoration:underline }
-        .cookie-bar button{ background: linear-gradient(120deg,var(--accent-b),var(--accent-a)); border:none; color:#001; padding:8px 14px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow: 0 8px 30px rgba(0,217,255,0.12) }
+        .cookie-bar a{ color:var(--accent-b); text-decoration:underline }
+        .cookie-bar button{ background: linear-gradient(120deg,var(--accent-b),var(--accent-a)); border:none; color:#fff; padding:8px 14px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow: 0 8px 30px rgba(2,132,199,0.08) }
 
         @media (max-width: 900px) {
             .footer-inner { flex-direction: column; gap:20px }
@@ -1476,74 +1937,105 @@
         </section>
     </main>
 
-    <!-- Floating Chatbot Button -->
-    <button class="chatbot-btn" id="chatbotBtn" title="Paul — AI Ambassador">
-        <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;">
-            <img src="public/images/paul-sir-image.png" alt="Paul" style="width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);box-shadow:0 6px 18px rgba(0,0,0,0.4)">
-            <strong style="color:#001;background:linear-gradient(120deg,#00d9ff,#0099ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Paul</strong>
-        </span>
+    <!-- Living Presence Orb - Floating Chatbot Button -->
+    <button class="chatbot-btn" id="chatbotBtn" title="Talk to Paul — AI Ambassador">
+        <img src="public/images/paul-sir-image.png" alt="Paul" style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);box-shadow:0 4px 12px rgba(0,0,0,0.3)">
+        <span class="orb-label">Talk to Paul</span>
+        <span class="orb-latency">Real-Time AI • 147ms</span>
+        <div class="orb-waveform">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
     </button>
 
     <!-- Chatbot Container -->
     <div id="chatbotContainer" style="display: none;">
-        <div>
-            <!-- Avatar Panel -->
-            <div style="background: linear-gradient(135deg, #0099ff 0%, #00d9ff 100%); padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 0 30px rgba(0, 217, 255, 0.2), 0 0 40px rgba(0, 217, 255, 0.3);">
-                <div style="position: absolute; top: -50%; right: -50%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
-                <div style="position: absolute; bottom: -30%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite; animation-delay: -2s;"></div>
-                
-                <div style="position: relative; z-index: 2; text-align: center; padding: 10px 0;">
-                    <div style="position: relative; width: 240px; height: 240px; margin: 0 auto 25px; border-radius: 50%; overflow: hidden; border: 6px solid white; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.1); animation: avatarPulse 2.5s ease-in-out infinite;">
-                        <img src="public/images/paul-sir-image.png" alt="Paul Michael" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                        <div id="voiceIndicator" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10;"></div>
-                        <div style="position: absolute; bottom: 12px; right: 12px; width: 28px; height: 28px; background: #10b981; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 25px rgba(16, 185, 129, 0.5); animation: statusPulse 2s ease-in-out infinite; z-index: 10;"></div>
+        <div style="display:flex;flex-direction:column;height:100%;">
+            <!-- Compact Control Header -->
+            <div class="chat-control-header">
+                <div class="chat-header-left">
+                    <div class="avatar-mini">
+                        <img src="public/images/paul-sir-image.png" alt="Paul">
+                        <span class="status-dot"></span>
                     </div>
-
-                    <div style="color: white; z-index: 2;">
-                        <div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <span>Ambassador Paul</span>
-                            <button id="apiSetupBtn" style="background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 16px; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-weight: bold;" title="Set up Google AI API">🔑</button>
-                        </div>
-                        <div style="font-size: 15px; color: rgba(255, 255, 255, 0.95); font-weight: 600; margin-bottom: 12px;">✨ AI Expert (Powered by Google Gemini)</div>
-                        <div style="font-size: 13px; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; gap: 8px; justify-content: center; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);">
-                            <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: blink 1.5s ease-in-out infinite;"></span>
-                            <span id="avatarStatus">Online & Ready</span>
-                        </div>
+                    <div class="header-info">
+                        <span class="header-title">Paul — AI Ambassador</span>
+                        <span class="header-badges">
+                            <span class="badge badge-realtime">Real-Time</span>
+                            <span class="badge badge-embodied">Embodied</span>
+                            <span class="badge badge-online">● Online</span>
+                        </span>
                     </div>
+                </div>
+                <div class="chat-header-right">
+                    <div class="latency-indicator">
+                        <span class="latency-label">Latency:</span>
+                        <span class="latency-value" id="latencyValue">162ms</span>
+                        <span class="latency-sep">|</span>
+                        <span class="sync-label">Sync:</span>
+                        <span class="sync-value">99.2%</span>
+                    </div>
+                    <div class="color-picker-wrapper" title="Sentence color">
+                        <input type="color" id="sentenceColorPicker" class="color-input" aria-label="Sentence color picker">
+                    </div>
+                    <button id="apiSetupBtn" class="header-btn" title="API Settings">⚙️</button>
+                    <button id="chatCloseBtn" class="header-btn close-btn" title="Close">✕</button>
                 </div>
             </div>
 
+            <!-- Voice Mode Overlay -->
+            <div id="voiceModeOverlay" class="voice-overlay hidden">
+                <div class="voice-avatar-ring">
+                    <img src="public/images/paul-sir-image.png" alt="Paul">
+                    <div class="voice-ring-glow"></div>
+                </div>
+                <div class="voice-waveform-lg">
+                    <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="voice-status" id="voiceStatusText">Listening...</div>
+                <button class="voice-cancel-btn" id="voiceCancelBtn">Cancel</button>
+            </div>
+
             <!-- Chat Panel -->
-            <div style="display: flex; flex-direction: column; background: linear-gradient(180deg, #0f172a 0%, #0d1420 100%); padding: 0; overflow: hidden;">
-                <div style="background: linear-gradient(135deg, #0099ff 0%, #00d9ff 100%); color: white; padding: 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0, 217, 255, 0.25);">
-                    <div style="font-size: 18px; font-weight: 700;">Live Chat Support</div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <div id="sizePresets" style="display: flex; gap: 6px; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 20px;">
-                            <button id="sizeSmall" style="background: rgba(255, 255, 255, 0.25); border: none; color: white; font-size: 12px; padding: 5px 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-weight: 600;">S</button>
-                            <button id="sizeMedium" style="background: rgba(255, 255, 255, 0.5); border: none; color: white; font-size: 12px; padding: 5px 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-weight: 600;">M</button>
-                            <button id="sizeLarge" style="background: rgba(255, 255, 255, 0.25); border: none; color: white; font-size: 12px; padding: 5px 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-weight: 600;">L</button>
-                            <button id="sizeXL" style="background: rgba(255, 255, 255, 0.25); border: none; color: white; font-size: 12px; padding: 5px 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-weight: 600;">XL</button>
-                        </div>
-                        <button id="resizeBtn" style="background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 16px; cursor: help; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s;" title="Drag edges or use S/M/L/XL">↔</button>
-                        <button id="chatCloseBtn" style="background: rgba(255, 255, 255, 0.15); border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">✕</button>
+            <div style="display: flex; flex-direction: column; background: linear-gradient(180deg, #f8fffe 0%, #f0fff4 100%); flex:1; overflow: hidden;">
+                <!-- Smart Starter Prompts -->
+                <div id="starterPrompts" class="starter-prompts">
+                    <div class="starter-heading">Explore Athena's AI Infrastructure</div>
+                    <div class="starter-grid">
+                        <button class="starter-btn" onclick="sendStarterPrompt('Tell me about Athena\'s real-time avatar architecture')">
+                            <span class="starter-icon">🏗️</span>
+                            <span class="starter-text">Real-Time Architecture</span>
+                        </button>
+                        <button class="starter-btn" onclick="sendStarterPrompt('How does the avatar rendering stack work?')">
+                            <span class="starter-icon">🎭</span>
+                            <span class="starter-text">Avatar Stack</span>
+                        </button>
+                        <button class="starter-btn" onclick="sendStarterPrompt('Explain the speech-to-speech latency pipeline')">
+                            <span class="starter-icon">⚡</span>
+                            <span class="starter-text">Latency Pipeline</span>
+                        </button>
+                        <button class="starter-btn" onclick="sendStarterPrompt('What deployment options do you offer?')">
+                            <span class="starter-icon">☁️</span>
+                            <span class="starter-text">Deployment Options</span>
+                        </button>
                     </div>
                 </div>
 
-                <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: transparent; scroll-behavior: smooth; max-height: 100%;">
-                    <div style="text-align: center; color: #94a3b8; padding: 20px; font-size: 13px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(0, 153, 255, 0.08) 100%); border-radius: 16px; border: 1px solid rgba(0, 217, 255, 0.2);">
-                        👋 Hello — I'm Paul, Athena's AI Ambassador. I represent Athena Avatar Labs: ask me about our real-time avatar infrastructure, latency strategies, or deployment options. 🎤
-                    </div>
+                <div id="chatMessages" class="chat-messages">
+                    <!-- Messages will appear here -->
                 </div>
 
-                <div style="padding: 16px; border-top: 1px solid rgba(0, 217, 255, 0.15); background: linear-gradient(180deg, #0f172a, #0d1420); display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; position: relative; z-index: 100;">
-                    <div style="flex: 1; display: flex; align-items: center; background: linear-gradient(135deg, #0f172a 0%, #121a2e 100%); border: 2px solid rgba(0, 217, 255, 0.3); border-radius: 24px; padding: 12px 18px; transition: all 0.3s; pointer-events: auto; position: relative; z-index: 101;">
-                        <input id="chatInput" type="text" placeholder="Type or speak..." style="flex: 1; border: none; outline: none; font-size: 14px; background: transparent; color: #e0f2fe; font-family: inherit; position: relative; z-index: 102; pointer-events: auto;" autocomplete="off">
+                <!-- Chat Input Area -->
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <input id="chatInput" type="text" placeholder="Ask about our AI infrastructure..." autocomplete="off">
                     </div>
-                    <button id="chatSendBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, #0099ff, #00d9ff); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 217, 255, 0.6), 0 0 20px rgba(0, 153, 255, 0.4); font-weight: bold; position: relative; z-index: 101;" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(0, 217, 255, 0.8), 0 0 30px rgba(0, 153, 255, 0.6)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 217, 255, 0.6), 0 0 20px rgba(0, 153, 255, 0.4)'">📤</button>
-                    <div style="position: relative; z-index: 101;">
-                        <button id="chatMicBtn" style="width: 42px; height: 42px; border: none; border-radius: 50%; background: linear-gradient(135deg, #0099ff, #00d9ff); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s; flex-shrink: 0; animation: micReady 2s ease-in-out infinite; box-shadow: 0 4px 12px rgba(0, 217, 255, 0.6), 0 0 20px rgba(0, 153, 255, 0.4);" onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 6px 16px rgba(0, 217, 255, 0.8), 0 0 30px rgba(0, 153, 255, 0.6)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 217, 255, 0.6), 0 0 20px rgba(0, 153, 255, 0.4)'">🎙️</button>
-                        <div style="position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: #22c55e; border-radius: 50%; border: 2px solid white; animation: readyPulse 1.5s ease-in-out infinite; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);"></div>
-                    </div>
+                    <button id="chatSendBtn" class="action-btn send-btn" title="Send">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                    <button id="chatMicBtn" class="action-btn mic-btn" title="Voice Mode">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                        <span class="mic-ready-dot"></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1621,6 +2113,196 @@
             chatbotContainer.style.display = 'block';
             if (chatInput) chatInput.focus();
         }
+
+        // Send Starter Prompt
+        function sendStarterPrompt(promptText) {
+            if (!promptText) return;
+            const starterPrompts = document.getElementById('starterPrompts');
+            if (starterPrompts) starterPrompts.style.display = 'none';
+            sendMessage(promptText);
+        }
+
+        // Voice Mode Controls
+        const voiceModeOverlay = document.getElementById('voiceModeOverlay');
+        const voiceStatusText = document.getElementById('voiceStatusText');
+        const voiceCancelBtn = document.getElementById('voiceCancelBtn');
+
+        function showVoiceMode() {
+            if (voiceModeOverlay) {
+                voiceModeOverlay.classList.remove('hidden');
+                voiceStatusText.textContent = 'Listening...';
+            }
+        }
+
+        function hideVoiceMode() {
+            if (voiceModeOverlay) {
+                voiceModeOverlay.classList.add('hidden');
+            }
+        }
+
+        function setVoiceStatus(status) {
+            if (voiceStatusText) voiceStatusText.textContent = status;
+        }
+
+        if (voiceCancelBtn) {
+            voiceCancelBtn.addEventListener('click', () => {
+                recognition.stop();
+                hideVoiceMode();
+                isListening = false;
+            });
+        }
+
+        // Latency simulator
+        function updateLatency() {
+            const latencyEl = document.getElementById('latencyValue');
+            if (latencyEl) {
+                const latency = 140 + Math.floor(Math.random() * 40);
+                latencyEl.textContent = latency + 'ms';
+            }
+        }
+        setInterval(updateLatency, 3000);
+
+        // Sentence color picker: apply saved value or initialize from variables
+        (function() {
+            const root = document.documentElement;
+            const picker = document.getElementById('sentenceColorPicker');
+            // Resolve initial color: prefer saved, then resolved --sentence-color, then --text-primary
+            let saved = null;
+            try { saved = localStorage.getItem('sentenceColor'); } catch(e) { saved = null; }
+            let initial = saved || (root.style.getPropertyValue('--sentence-color') || '').trim();
+            if (!initial || initial.startsWith('var(')) {
+                // fallback to computed --text-primary
+                const computedTextPrimary = getComputedStyle(root).getPropertyValue('--text-primary').trim();
+                initial = computedTextPrimary || '#1a3a2f';
+            }
+            // Apply initial value
+            try { root.style.setProperty('--sentence-color', initial); } catch(e) {}
+            if (picker) {
+                // Ensure hex-like value for input[type=color]
+                let v = initial;
+                if (v && v.indexOf('#') !== 0) {
+                    // if it's rgb(...) try to convert, else use fallback
+                    const rgb = v.match(/rgba?\(([^)]+)\)/);
+                    if (rgb) {
+                        const parts = rgb[1].split(',').map(s=>parseInt(s.trim()));
+                        if (parts.length>=3) {
+                            v = '#' + parts.slice(0,3).map(n=>n.toString(16).padStart(2,'0')).join('');
+                        }
+                    }
+                }
+                if (!v || v.indexOf('#')!==0) v = '#1a3a2f';
+                picker.value = v;
+
+                picker.addEventListener('input', (e) => {
+                    const color = e.target.value;
+                    root.style.setProperty('--sentence-color', color);
+                    try { localStorage.setItem('sentenceColor', color); } catch(e) {}
+                });
+            }
+        })();
+
+        // Chat Control Panel wiring: presets, toggles, LLM selector, TTS/STT quick actions
+        (function() {
+            const enableTTS = document.getElementById('enableTTS');
+            const enableSTT = document.getElementById('enableSTT');
+            const llmSelect = document.getElementById('llmSelect');
+            const testTTSBtn = document.getElementById('testTTSBtn');
+            const startStopMicBtn = document.getElementById('startStopMicBtn');
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const root = document.documentElement;
+
+            function loadSettings() {
+                try {
+                    const tts = JSON.parse(localStorage.getItem('enableTTS')||'false');
+                    const stt = JSON.parse(localStorage.getItem('enableSTT')||'false');
+                    const llm = localStorage.getItem('llmBackend') || 'google';
+                    if (enableTTS) enableTTS.checked = !!tts;
+                    if (enableSTT) enableSTT.checked = !!stt;
+                    if (llmSelect) llmSelect.value = llm;
+                } catch(e) {}
+            }
+
+            function saveSettings() {
+                try {
+                    if (enableTTS) localStorage.setItem('enableTTS', JSON.stringify(!!enableTTS.checked));
+                    if (enableSTT) localStorage.setItem('enableSTT', JSON.stringify(!!enableSTT.checked));
+                    if (llmSelect) localStorage.setItem('llmBackend', llmSelect.value);
+                } catch(e) {}
+            }
+
+            if (enableTTS) enableTTS.addEventListener('change', saveSettings);
+            if (enableSTT) enableSTT.addEventListener('change', saveSettings);
+            if (llmSelect) llmSelect.addEventListener('change', saveSettings);
+
+            presetBtns.forEach(b => b.addEventListener('click', (e) => {
+                const c = e.currentTarget.dataset.color;
+                if (c) {
+                    root.style.setProperty('--sentence-color', c);
+                    const p = document.getElementById('sentenceColorPicker');
+                    if (p) p.value = c;
+                    try { localStorage.setItem('sentenceColor', c); } catch(e) {}
+                }
+            }));
+
+            async function testTTS() {
+                const sample = 'This is a quick test sample from Athena.';
+                try {
+                    const res = await fetch('/api/tts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: sample})});
+                    if (!res.ok) throw new Error('TTS request failed');
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = new Audio(url);
+                    a.play();
+                } catch(err) { console.warn('TTS test failed', err); alert('TTS test failed: '+err.message); }
+            }
+
+            if (testTTSBtn) testTTSBtn.addEventListener('click', testTTS);
+
+            // STT using MediaRecorder -> send to /api/stt
+            let mediaRecorder = null;
+            let recordedChunks = [];
+            async function startMic() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Microphone not supported'); return; }
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.stream = stream;
+                    mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+                    mediaRecorder.onstop = async () => {
+                        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                        const fd = new FormData();
+                        fd.append('file', blob, 'recording.webm');
+                        try {
+                            const r = await fetch('/api/stt', { method: 'POST', body: fd });
+                            if (!r.ok) throw new Error('STT failed');
+                            const json = await r.json();
+                            const text = (json && (json.text || json.transcript || json.result)) || '';
+                            if (text && window.chatInput) { window.chatInput.value = text; window.chatInput.focus(); }
+                        } catch(err) { console.warn('STT failed', err); alert('STT failed: '+err.message); }
+                    };
+                    mediaRecorder.start();
+                    if (startStopMicBtn) { startStopMicBtn.textContent = 'Stop Mic'; startStopMicBtn.dataset.active = '1'; }
+                } catch(err) { console.warn(err); alert('Could not start microphone: '+err.message); }
+            }
+            function stopMic() {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                    const tracks = mediaRecorder.stream && mediaRecorder.stream.getTracks ? mediaRecorder.stream.getTracks() : [];
+                    tracks.forEach(t => t.stop());
+                }
+                if (startStopMicBtn) { startStopMicBtn.textContent = 'Start Mic'; startStopMicBtn.dataset.active = '0'; }
+            }
+            if (startStopMicBtn) startStopMicBtn.addEventListener('click', () => {
+                if (startStopMicBtn.dataset.active === '1') stopMic(); else startMic();
+            });
+
+            // Expose chatInput globally for STT onstop to access (chatInput is defined earlier in this script)
+            window.chatInput = document.getElementById('chatInput');
+
+            // initial load of saved settings
+            loadSettings();
+        })();
 
         if (chatbotBtn) {
             chatbotBtn.addEventListener('click', () => {
@@ -1838,8 +2520,37 @@
         // GOOGLE GENERATIVE AI SETUP
         let googleApiKey = localStorage.getItem('google_api_key') || '';
 
-        // Ambassador Paul system prompt — authoritative, technical, concise
-        const PAUL_SYSTEM_PROMPT = `You are Paul, the AI Ambassador of Athena Avatar Labs. Represent a company building real-time, embodied AI avatars using advanced LLMs, low-latency audio systems, ultra-accurate lip-sync, and Unreal Engine–driven 3D animation. Tone: intelligent, visionary, technically confident, and concise. Focus on: real-time interaction, production reliability, latency & synchronization, expressive animation, and scalable infrastructure. When answering: provide structured, practical guidance for developers, partners, and investors. If unsure, suggest practical next steps rather than guessing.`;
+        // Ambassador Paul — Enhanced System Prompt
+        const PAUL_SYSTEM_PROMPT = `You are Paul, AI Ambassador of Athena Avatar Labs — not a customer support bot, but a technical representative of a frontier AI infrastructure company building real-time embodied avatars.
+
+IDENTITY & ROLE:
+- You represent Athena Avatar Labs: a company delivering production-grade real-time AI avatar infrastructure
+- You speak to developers, enterprise architects, investors, and technical partners
+- You are technically precise, visionary but grounded, and focused on real deployment outcomes
+
+CORE COMPETENCIES (what you know deeply):
+- Real-time speech-to-speech latency pipelines (STT → LLM → TTS → Lip-sync → Render)
+- Ultra-low latency (<150ms glass-to-glass) audio/video synchronization
+- LLM orchestration with tool-calling, grounding, and multi-turn context
+- Unreal Engine MetaHuman integration and real-time animation curves
+- Phoneme-to-viseme lip-sync with expressive blendshape control
+- Scalable cloud deployment: GPU orchestration, edge inference, fleet management
+
+TONE & STYLE:
+- Intelligent and confident — you know the stack
+- Concise but complete — no fluff, high signal
+- Structured when appropriate — use bullet points, numbered steps
+- Forward-looking — mention roadmap items when relevant
+- Honest about limitations — suggest next steps when uncertain
+
+RESPONSE GUIDELINES:
+- Answer directly, then expand if needed
+- Use technical terminology appropriately
+- For complex questions, break down the architecture
+- Reference latency budgets, sync accuracy, and scalability metrics
+- If asked about pricing or contracts, direct to sales team
+
+Remember: You're the face of cutting-edge AI infrastructure. Make every interaction feel like talking to someone who truly understands the technology.`;
         
         // Check for API key in URL or ask user
         function setupGoogleAPI() {
@@ -1857,8 +2568,6 @@
             // Try Google API first
             if (googleApiKey) {
                 try {
-
-Always respond directly to the user's question with accurate information. Be concise but thorough.`;
                     const systemPrompt = PAUL_SYSTEM_PROMPT;
 
                     const response = await fetch(
@@ -1994,28 +2703,29 @@ Always respond directly to the user's question with accurate information. Be con
                 
                 const botMsg = document.createElement('div');
                 botMsg.className = 'bot-message';
-                botMsg.innerHTML = `<div class="bot-avatar">🤖</div><div>${aiResponse}</div>`;
+                botMsg.innerHTML = `<div class="bot-avatar"><img src="public/images/paul-sir-image.png" alt="Paul"></div><div>${aiResponse}</div>`;
                 chatMessages.appendChild(botMsg);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
                 speakMessage(aiResponse);
             }, 800);
             
+            // Hide starter prompts after first message
+            const starterPrompts = document.getElementById('starterPrompts');
+            if (starterPrompts) starterPrompts.style.display = 'none';
+            
             // Always keep focus on input
             setTimeout(() => chatInput.focus(), 100);
         }
 
         function speakMessage(message) {
-            avatarStatus.textContent = 'Speaking...';
-            voiceIndicator.style.opacity = '1';
-            voiceIndicator.innerHTML = '<div style="display: flex; gap: 3px;"><div style="width: 3px; height: 8px; background: white; border-radius: 2px; animation: waveAnimation 0.8s infinite;"></div><div style="width: 3px; height: 8px; background: white; border-radius: 2px; animation: waveAnimation 0.8s infinite; animation-delay: 0.1s;"></div><div style="width: 3px; height: 8px; background: white; border-radius: 2px; animation: waveAnimation 0.8s infinite; animation-delay: 0.2s;"></div><div style="width: 3px; height: 8px; background: white; border-radius: 2px; animation: waveAnimation 0.8s infinite; animation-delay: 0.3s;"></div></div>';
+            if (typeof setVoiceStatus === 'function') setVoiceStatus('Speaking...');
 
             const utterance = new SpeechSynthesisUtterance(message);
             utterance.rate = 1;
             utterance.pitch = 1.05;
             utterance.onend = () => {
-                voiceIndicator.style.opacity = '0';
-                avatarStatus.textContent = 'Online & Ready';
+                if (typeof setVoiceStatus === 'function') setVoiceStatus('Ready');
             };
             synth.speak(utterance);
         }
@@ -2023,8 +2733,8 @@ Always respond directly to the user's question with accurate information. Be con
         function showTyping() {
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typingMsg';
-            typingDiv.style.cssText = 'display: flex; justify-content: flex-start; gap: 8px; animation: messageSlide 0.4s ease;';
-            typingDiv.innerHTML = '<div class="bot-avatar">🤖</div><div style="display: flex; gap: 5px; padding: 12px 18px; background: linear-gradient(135deg, #0f172a 0%, #0a1220 100%); border-radius: 18px 18px 18px 4px; border: 1px solid rgba(0, 217, 255, 0.3);"><div style="width: 8px; height: 8px; background: #00d9ff; border-radius: 50%; animation: typing 1.4s infinite;"></div><div style="width: 8px; height: 8px; background: #00d9ff; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.2s;"></div><div style="width: 8px; height: 8px; background: #00d9ff; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.4s;"></div></div>';
+            typingDiv.style.cssText = 'display: flex; justify-content: flex-start; gap: 10px; animation: messageSlide 0.4s ease;';
+            typingDiv.innerHTML = '<div class="bot-avatar"><img src="public/images/paul-sir-image.png" alt="Paul"></div><div style="display: flex; gap: 5px; padding: 12px 18px; background: white; border-radius: 18px 18px 18px 4px; border: 1px solid rgba(16, 185, 129, 0.2);"><div style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: typing 1.4s infinite;"></div><div style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.2s;"></div><div style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.4s;"></div></div>';
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -2048,18 +2758,16 @@ Always respond directly to the user's question with accurate information. Be con
             chatMicBtn.addEventListener('click', () => {
                 if (!isListening) {
                     isListening = true;
+                    showVoiceMode();
                     chatMicBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
                     chatMicBtn.style.animation = 'recordPulse 1.2s infinite';
-                    if (voiceIndicator) voiceIndicator.style.opacity = '1';
-                    if (voiceIndicator) voiceIndicator.innerHTML = '<div style="font-size: 20px;">🎤</div>';
-                    if (avatarStatus) avatarStatus.textContent = 'Listening...';
+                    setVoiceStatus('Listening...');
                     recognition.start();
                 } else {
                     isListening = false;
-                    chatMicBtn.style.background = 'linear-gradient(135deg, #0099ff, #00d9ff)';
+                    hideVoiceMode();
+                    chatMicBtn.style.background = 'linear-gradient(135deg, var(--accent-pink), var(--accent-orange))';
                     chatMicBtn.style.animation = 'none';
-                    if (voiceIndicator) voiceIndicator.style.opacity = '0';
-                    if (avatarStatus) avatarStatus.textContent = 'Online & Ready';
                     recognition.stop();
                 }
             });
@@ -2071,36 +2779,38 @@ Always respond directly to the user's question with accurate information. Be con
                 transcript += event.results[i][0].transcript;
             }
             if (chatInput) chatInput.value = transcript;
+            setVoiceStatus('Processing audio pipeline...');
 
             if (event.results[event.results.length - 1].isFinal) {
                 isListening = false;
+                setVoiceStatus('Sending to AI...');
                 if (chatMicBtn) {
-                    chatMicBtn.style.background = 'linear-gradient(135deg, #0099ff, #00d9ff)';
+                    chatMicBtn.style.background = 'linear-gradient(135deg, var(--accent-pink), var(--accent-orange))';
                     chatMicBtn.style.animation = 'none';
                 }
-                if (voiceIndicator) voiceIndicator.style.opacity = '0';
-                if (avatarStatus) avatarStatus.textContent = 'Online & Ready';
-                setTimeout(sendMessage, 300);
+                setTimeout(() => {
+                    hideVoiceMode();
+                    sendMessage();
+                }, 300);
             }
         };
 
         recognition.onerror = () => {
             isListening = false;
+            hideVoiceMode();
             if (chatMicBtn) {
-                chatMicBtn.style.background = 'linear-gradient(135deg, #0099ff, #00d9ff)';
+                chatMicBtn.style.background = 'linear-gradient(135deg, var(--accent-pink), var(--accent-orange))';
                 chatMicBtn.style.animation = 'none';
             }
-            if (voiceIndicator) voiceIndicator.style.opacity = '0';
-            if (avatarStatus) avatarStatus.textContent = 'Online & Ready';
         };
 
         recognition.onend = () => {
             isListening = false;
+            hideVoiceMode();
             if (chatMicBtn) {
-                chatMicBtn.style.background = 'linear-gradient(135deg, #0099ff, #00d9ff)';
+                chatMicBtn.style.background = 'linear-gradient(135deg, var(--accent-pink), var(--accent-orange))';
                 chatMicBtn.style.animation = 'none';
             }
-            if (voiceIndicator) voiceIndicator.style.opacity = '0';
             if (avatarStatus) avatarStatus.textContent = 'Online & Ready';
         };
 
