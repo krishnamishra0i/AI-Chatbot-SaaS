@@ -1,0 +1,85 @@
+<footer class="site-footer">
+    <div class="footer-hero" role="region" aria-label="call to action">
+        <div class="hero-copy">
+            <h3>Try GoInsight.AI — Level Up Your Team</h3>
+            <p>Bring your team, systems, and AI into one place — then turn ideas into governed work.</p>
+        </div>
+        <div class="hero-cta">
+            <a class="cta-btn" href="#">Start Free Trial</a>
+        </div>
+    </div>
+
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="logo">GoInsight.AI <span>Sand Studio</span></div>
+            <p style="margin-top:12px; opacity:0.92">Crafting real-time AI avatar experiences for teams and creators.</p>
+        </div>
+
+        <div class="footer-cols">
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#">Platform</a></li>
+                    <li><a href="#">Integrations</a></li>
+                    <li><a href="#">Docs</a></li>
+                    <li><a href="#">Pricing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div>© 2026 GoInsight.AI. All rights reserved.</div>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+        </div>
+    </div>
+
+    <div class="cookie-bar" id="cookieBar">
+        <div style="flex:1; opacity:0.95; font-size:14px;">GoInsight.AI uses cookies to improve content. See <a href="#">Cookie Policy</a> for more details.</div>
+        <button id="cookieAccept">OK, Got it!</button>
+    </div>
+
+    <script>
+        // Footer partial behavior: cookie persistence and entrance animation
+        (function(){
+            const bar = document.getElementById('cookieBar');
+            const accept = document.getElementById('cookieAccept');
+            try {
+                if (localStorage.getItem('cookieAccepted') === 'true') {
+                    bar.style.display = 'none';
+                } else {
+                    // small delay so page content animates first
+                    setTimeout(()=> bar.classList.add('show'), 450);
+                }
+
+                accept.addEventListener('click', ()=>{
+                    localStorage.setItem('cookieAccepted','true');
+                    bar.classList.remove('show');
+                    setTimeout(()=> bar.style.display='none', 420);
+                });
+            } catch(e){ console.warn('cookie bar init failed', e) }
+        })();
+    </script>
+</footer>

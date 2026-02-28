@@ -1027,46 +1027,66 @@
                 grid-template-columns: 1fr;
             }
         }
-        /* Footer styles */
-        .site-footer {
-            background: linear-gradient(180deg,#05060a 0%, #071026 100%);
-            color: #cbd5e1;
-            padding: 40px 20px 120px;
-            border-top: 1px solid rgba(255,255,255,0.03);
+        /* Footer styles - variables and animations for richer look */
+        :root{
+            --accent-a: #00d9ff;
+            --accent-b: #0099ff;
+            --accent-c: #00ffff;
+            --footer-bg-1: #05060a;
+            --footer-bg-2: #071026;
+            --muted: #cbd5e1;
         }
+
+        .site-footer {
+            background: linear-gradient(180deg,var(--footer-bg-1) 0%, var(--footer-bg-2) 100%);
+            color: var(--muted);
+            padding: 48px 20px 140px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            position: relative;
+        }
+
+        @keyframes gradientShift { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
 
         .footer-hero {
             max-width: 1180px;
             margin: 0 auto 26px;
-            background: linear-gradient(120deg,#0f4bff 0%, #00d9ff 100%);
-            padding: 36px 36px;
+            background: linear-gradient(90deg, var(--accent-b), var(--accent-a), var(--accent-c));
+            background-size: 300% 300%;
+            animation: gradientShift 8s linear infinite;
+            padding: 34px 36px;
             border-radius: 18px;
             box-shadow: 0 30px 70px rgba(3,8,18,0.8), inset 0 -6px 40px rgba(0,0,0,0.06);
             color: #fff;
-            text-align: center;
             display:flex;
             align-items:center;
             justify-content:space-between;
             gap:20px;
+            transform: translateY(0); transition: transform 0.36s cubic-bezier(.2,.8,.2,1);
         }
 
+        .footer-hero:hover{ transform: translateY(-6px) }
         .footer-hero .hero-copy { text-align:left; max-width:900px; }
-        .footer-hero h3 { font-size: 28px; margin-bottom: 6px; font-weight:800; }
-        .footer-hero p { opacity: 0.95; margin-bottom: 0; }
+        .footer-hero h3 { font-size: 28px; margin-bottom: 6px; font-weight:800; letter-spacing: -0.02em }
+        .footer-hero p { opacity: 0.96; margin-bottom: 0; }
         .footer-hero .hero-cta { margin-left:auto; }
+        .footer-hero .cta-btn{ padding:10px 22px; font-weight:800 }
 
         .footer-inner { max-width:1180px; margin: 28px auto 0; display:flex; gap:36px; align-items:flex-start; justify-content:space-between; }
         .footer-brand { flex:1; min-width:220px; }
+        .footer-brand .logo{ font-size:20px }
+
         .footer-cols { flex:2; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
         .footer-col h4{ font-size:14px; font-weight:700; margin-bottom:12px; color:#e6fbff }
         .footer-col ul{ list-style:none; padding:0; margin:0 }
-        .footer-col a{ color: #cfefff; text-decoration:none; display:block; margin-bottom:8px; opacity:0.92 }
+        .footer-col a{ color: #cfefff; text-decoration:none; display:block; margin-bottom:8px; opacity:0.92; transition: color .18s ease, transform .12s ease }
+        .footer-col a:hover{ color: #fff; transform: translateX(6px) }
 
-        .footer-bottom { max-width:1180px; margin: 32px auto 0; display:flex; justify-content:space-between; align-items:center; padding-top:18px; border-top:1px solid rgba(255,255,255,0.03); opacity:0.9 }
+        .footer-bottom { max-width:1180px; margin: 32px auto 0; display:flex; justify-content:space-between; align-items:center; padding-top:18px; border-top:1px solid rgba(255,255,255,0.03); opacity:0.95 }
 
-        .cookie-bar{ position:fixed; left:20px; right:20px; bottom:20px; background: linear-gradient(180deg, rgba(6,8,18,0.96), rgba(4,6,12,0.98)); color:#dbeffe; padding:12px 18px; border-radius:999px; border:1px solid rgba(255,255,255,0.04); display:flex; gap:14px; align-items:center; justify-content:center; box-shadow:0 12px 40px rgba(2,6,20,0.7); z-index:1200 }
+        .cookie-bar{ position:fixed; left:20px; right:20px; bottom:20px; background: linear-gradient(180deg, rgba(6,8,18,0.96), rgba(4,6,12,0.98)); color:#dbeffe; padding:12px 18px; border-radius:999px; border:1px solid rgba(255,255,255,0.04); display:flex; gap:14px; align-items:center; justify-content:center; box-shadow:0 12px 40px rgba(2,6,20,0.7); z-index:1200; opacity:0; transform: translateY(20px); transition: opacity .36s ease, transform .36s cubic-bezier(.2,.8,.2,1) }
+        .cookie-bar.show{ opacity:1; transform: translateY(0) }
         .cookie-bar a{ color:#e9fbff; text-decoration:underline }
-        .cookie-bar button{ background: linear-gradient(120deg,#0099ff,#00d9ff); border:none; color:#001; padding:8px 14px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow: 0 8px 30px rgba(0,217,255,0.12) }
+        .cookie-bar button{ background: linear-gradient(120deg,var(--accent-b),var(--accent-a)); border:none; color:#001; padding:8px 14px; border-radius:999px; font-weight:800; cursor:pointer; box-shadow: 0 8px 30px rgba(0,217,255,0.12) }
 
         @media (max-width: 900px) {
             .footer-inner { flex-direction: column; gap:20px }
@@ -1459,72 +1479,8 @@
         <div class="resize-handle edge-v rm" data-dir="rm"></div>
     </div>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="footer-hero">
-            <div class="hero-copy">
-                <h3>Try GoInsight.AI, Level Up Your Team</h3>
-                <p>Bring your team, systems, and AI into one place—then turn ideas into governed work.</p>
-            </div>
-            <div class="hero-cta">
-                <button class="cta-btn">Start Free Trial</button>
-            </div>
-        </div>
-
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <div class="logo">GoInsight.AI <span>Sand Studio</span></div>
-                <p style="margin-top:12px; opacity:0.92">Small studio crafting real-time AI avatar experiences.</p>
-            </div>
-
-            <div class="footer-cols">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms &amp; Conditions</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="#">Tutorials</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Academy</a></li>
-                        <li><a href="#">Templates</a></li>
-                        <li><a href="#">Case Studies</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Follow Us</h4>
-                    <ul>
-                        <li><a href="#">YouTube</a></li>
-                        <li><a href="#">Discord</a></li>
-                        <li><a href="#">GitHub</a></li>
-                        <li><a href="#">Twitter</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <div>© 2026 GoInsight.AI. All rights reserved.</div>
-            <div style="display:flex; gap:12px; align-items:center;">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-            </div>
-        </div>
-
-        <div class="cookie-bar" id="cookieBar">
-            <div style="flex:1; opacity:0.95; font-size:14px;">GoInsight.AI uses cookies to improve content. See <a href="#">Cookie Policy</a> for more details.</div>
-            <button id="cookieAccept" onclick="document.getElementById('cookieBar').style.display='none'">OK, Got it!</button>
-        </div>
-    </footer>
+    <!-- Footer placeholder - loaded from partial for reuse -->
+    <div id="siteFooter" data-partial="/partials/footer.html"></div>
 
     <script>
         // FAQ Toggle Function
@@ -1539,6 +1495,21 @@
                 answer.style.padding = '0 20px';
             }
         }
+
+        // Load footer partial and initialize
+        (function loadFooter(){
+            const placeholder = document.getElementById('siteFooter');
+            if(!placeholder) return;
+            const partialPath = placeholder.dataset.partial || '/partials/footer.html';
+            fetch(partialPath)
+                .then(r => { if(!r.ok) throw new Error('partial not found'); return r.text() })
+                .then(html => {
+                    placeholder.innerHTML = html;
+                })
+                .catch(err => {
+                    console.warn('Footer partial load failed:', err);
+                });
+        })();
 
         const chatbotBtn = document.getElementById('chatbotBtn');
         const chatbotContainer = document.getElementById('chatbotContainer');
