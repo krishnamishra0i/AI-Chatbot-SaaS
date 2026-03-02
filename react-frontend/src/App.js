@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import axios from 'axios';
 import './App.css';
+import FeatureCards from './FeatureCards';
 
 // Styled Components
 const Container = styled.div`
@@ -100,7 +101,7 @@ const Main = styled.main`
 const Hero = styled.section`
   padding: 140px 40px 100px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   z-index: 2;
   max-width: 1400px;
   margin: 0 auto;
@@ -146,6 +147,7 @@ const HeroRight = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: visible;
 `;
 
 const HeroText = styled.div`
@@ -287,23 +289,64 @@ const AvatarContainer = styled.div`
   position: relative;
   width: 400px;
   height: 400px;
+  border-radius: 50%;
+  overflow: visible;
   
+  /* Primary pulsing glow */
   &::before {
     content: '';
     position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+    top: -30px;
+    left: -30px;
+    right: -30px;
+    bottom: -30px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, rgba(99, 62, 206, 0.2) 30%, rgba(59, 130, 246, 0.12) 55%, transparent 75%);
     border-radius: 50%;
-    animation: glowPulse 3s ease-in-out infinite;
+    animation: avatarGlowPulse 3s ease-in-out infinite;
+    z-index: -1;
+  }
+  
+  /* Secondary outer glow ring */
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 92, 246, 0.15);
+    animation: avatarRingPulse 4s ease-in-out infinite;
     z-index: -1;
   }
   
   @media (max-width: 768px) {
     width: 300px;
     height: 300px;
+  }
+  
+  @keyframes avatarGlowPulse {
+    0%, 100% { 
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 1;
+      transform: scale(1.08);
+    }
+  }
+  
+  @keyframes avatarRingPulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+      border-color: rgba(139, 92, 246, 0.15);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.05);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
   }
 `;
 
@@ -313,6 +356,28 @@ const AvatarVideo = styled.video`
   border-radius: 20px;
   object-fit: cover;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+`;
+
+const AvatarImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 
+    0 0 30px rgba(139, 92, 246, 0.35),
+    0 0 60px rgba(139, 92, 246, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(139, 92, 246, 0.3);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  &:hover {
+    box-shadow: 
+      0 0 40px rgba(139, 92, 246, 0.55),
+      0 0 80px rgba(139, 92, 246, 0.25),
+      0 25px 70px rgba(0, 0, 0, 0.5);
+    border-color: rgba(139, 92, 246, 0.6);
+    transform: scale(1.05);
+  }
 `;
 
 const FloatingPanel = styled(motion.div)`
@@ -330,19 +395,22 @@ const FloatingPanel = styled(motion.div)`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   
   &.panel-1 {
-    top: -20px;
-    right: -40px;
+    top: -30px;
+    right: -60px;
+    z-index: 10;
   }
   
   &.panel-2 {
-    bottom: 20px;
-    left: -60px;
+    bottom: -10px;
+    left: -80px;
+    z-index: 10;
   }
   
   &.panel-3 {
     top: 50%;
-    right: -80px;
+    right: -100px;
     transform: translateY(-50%);
+    z-index: 10;
   }
 `;
 
@@ -601,6 +669,36 @@ const FeatureCard = styled(motion.div)`
   }
 `;
 
+const FeatureImage = styled.div`
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.08);
+  }
+`;
+
 const FeatureIcon = styled.div`
   font-size: 56px;
   margin-bottom: 24px;
@@ -671,7 +769,7 @@ const ChatAvatarContainer = styled.div`
   gap: 15px;
 `;
 
-const AvatarImage = styled.div`
+const ChatAvatarIcon = styled.div`
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -842,29 +940,21 @@ const FloatingButton = styled(motion.button)`
 `;
 
 const Footer = styled.footer`
-  background: #f8f9fa;
-  color: #333333;
+  background: #080B14;
+  color: rgba(255, 255, 255, 0.6);
   padding: 60px 40px;
   text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 2;
 `;
 
 // Additional Styled Components for Complete Features
 const VisualShowcase = styled.section`
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.9) 50%, rgba(233, 236, 239, 0.85) 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  background: #0B0F19;
   padding: 80px 40px;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.3) 0%, rgba(248, 249, 250, 0.2) 50%, rgba(233, 236, 239, 0.1) 100%);
-    pointer-events: none;
-  }
+  position: relative;
+  z-index: 2;
 `;
 
 const ShowcaseContent = styled.div`
@@ -876,7 +966,7 @@ const ShowcaseContent = styled.div`
 const ShowcaseTitle = styled.h2`
   font-size: 48px;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #ffffff, #8B5CF6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -884,7 +974,7 @@ const ShowcaseTitle = styled.h2`
 `;
 
 const ShowcaseDescription = styled.p`
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 18px;
   margin-bottom: 60px;
   line-height: 1.8;
@@ -898,15 +988,22 @@ const ShowcaseGrid = styled.div`
 `;
 
 const ShowcaseCard = styled(motion.div)`
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
   padding: 40px;
   border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 50px rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+  
+  p {
+    color: rgba(255, 255, 255, 0.6);
   }
 `;
 
@@ -918,13 +1015,15 @@ const ShowcaseIcon = styled.div`
 const ShowcaseCardTitle = styled.h3`
   font-size: 24px;
   font-weight: 600;
-  color: #1e293b;
+  color: #ffffff;
   margin-bottom: 15px;
 `;
 
 const UsedBySection = styled.section`
-  background: white;
+  background: #111827;
   padding: 80px 40px;
+  position: relative;
+  z-index: 2;
 `;
 
 const UsedByContent = styled.div`
@@ -941,7 +1040,7 @@ const UsedByText = styled.div``;
 const UsedByTitle = styled.h2`
   font-size: 48px;
   margin-bottom: 30px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #ffffff, #8B5CF6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -962,8 +1061,10 @@ const UsedByImageContainer = styled.div`
 `;
 
 const IntegrationsSection = styled.section`
-  background: linear-gradient(135deg, #f5f7fa, #e8ecff);
+  background: #0B0F19;
   padding: 80px 40px;
+  position: relative;
+  z-index: 2;
 `;
 
 const IntegrationsContent = styled.div`
@@ -978,7 +1079,10 @@ const IntegrationsContent = styled.div`
 const IntegrationsTitle = styled.h2`
   font-size: 48px;
   margin-bottom: 30px;
-  color: #333;
+  background: linear-gradient(135deg, #ffffff, #3B82F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-weight: 800;
 `;
 
@@ -990,29 +1094,34 @@ const IntegrationGrid = styled.div`
 `;
 
 const IntegrationCard = styled.div`
-  background: white;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
+  color: white;
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
   }
 `;
 
 const EnterpriseSection = styled.section`
-  background: white;
+  background: #111827;
   padding: 80px 40px;
+  position: relative;
+  z-index: 2;
 `;
 
 const EnterpriseTitle = styled.h2`
   font-size: 48px;
   text-align: center;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #ffffff, #06B6D4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1021,7 +1130,7 @@ const EnterpriseTitle = styled.h2`
 
 const EnterpriseSubtitle = styled.p`
   text-align: center;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 16px;
   margin-bottom: 60px;
 `;
@@ -1035,22 +1144,27 @@ const EnterpriseGrid = styled.div`
 `;
 
 const EnterpriseCard = styled(motion.div)`
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
   padding: 30px;
   border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.3);
   }
 `;
 
 const TestimonialsSection = styled.section`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, #111827 100%);
   color: white;
   padding: 80px 40px;
+  position: relative;
+  z-index: 2;
 `;
 
 const TestimonialsTitle = styled.h2`
@@ -1115,15 +1229,17 @@ const AuthorRole = styled.div`
 `;
 
 const FAQSection = styled.section`
-  background: white;
+  background: #0B0F19;
   padding: 80px 40px;
+  position: relative;
+  z-index: 2;
 `;
 
 const FAQTitle = styled.h2`
   font-size: 48px;
   text-align: center;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #8B5CF6, #3B82F6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1137,7 +1253,7 @@ const FAQContainer = styled.div`
 
 const FAQItem = styled(motion.div)`
   margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -1145,38 +1261,45 @@ const FAQItem = styled(motion.div)`
 
 const FAQQuestion = styled.div`
   padding: 20px;
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.04);
   font-weight: 600;
   font-size: 16px;
+  color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
   
   &:hover {
-    background: #e5e7eb;
+    background: rgba(139, 92, 246, 0.1);
   }
 `;
 
 const FAQAnswer = styled.div`
   padding: 20px;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-  color: #666;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
 `;
 
 const CTASection = styled.section`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, #0B0F19 70%);
   color: white;
-  padding: 80px 40px;
+  padding: 120px 40px;
   text-align: center;
+  position: relative;
+  z-index: 2;
 `;
 
 const CTATitle = styled.h2`
-  font-size: 48px;
+  font-size: 52px;
   margin-bottom: 20px;
   font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 `;
 
 const CTADescription = styled.p`
@@ -1186,19 +1309,109 @@ const CTADescription = styled.p`
 `;
 
 const CTASectionButton = styled.button`
-  padding: 15px 40px;
-  background: white;
-  color: #667eea;
+  padding: 18px 48px;
+  background: linear-gradient(135deg, #8B5CF6, #3B82F6, #06B6D4);
+  color: white;
   border: none;
-  border-radius: 30px;
+  border-radius: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   transition: all 0.3s;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+  animation: glowPulse 2s ease-in-out infinite;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.6);
+  }
+  
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4); }
+    50% { box-shadow: 0 10px 40px rgba(139, 92, 246, 0.6); }
+  }
+`;
+
+// Why We're Different Section
+const WhyDifferentSection = styled.section`
+  background: #0B0F19;
+  padding: 100px 40px;
+  position: relative;
+  z-index: 2;
+`;
+
+const WhyDifferentTitle = styled.h2`
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 60px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+
+const WhyDifferentGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const WhyDifferentCard = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  padding: 48px 32px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #8B5CF6, #3B82F6, #06B6D4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.3);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+  
+  .icon {
+    font-size: 56px;
+    margin-bottom: 24px;
+  }
+  
+  h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    font-size: 16px;
   }
 `;
 
@@ -1368,10 +1581,10 @@ function App() {
   };
 
   const features = [
-    { icon: '�️', title: 'Real-Time Voice Processing', description: 'Advanced speech-to-text with ultra-low latency and high accuracy for natural conversations' },
-    { icon: '🤖', title: 'AI Chat Intelligence', description: 'Powered by cutting-edge LLM technology for intelligent, context-aware responses' },
-    { icon: '�', title: 'Unreal Engine Integration', description: 'Seamless integration with Unreal Engine for photorealistic 3D avatars' },
-    { icon: '�', title: 'Ultra-Accurate Lip Sync', description: 'Precision lip-sync technology that matches speech patterns perfectly' }
+    { icon: '🔊', title: 'Real-Time Voice Processing', description: 'Advanced speech-to-text with ultra-low latency and high accuracy for natural conversations', image: '/images/real-time-voice-processing.jpg' },
+    { icon: '🤖', title: 'AI Chat Intelligence', description: 'Powered by cutting-edge LLM technology for intelligent, context-aware responses', image: '/images/ai-chat-intelligence.png' },
+    { icon: '🎮', title: 'Unreal Engine Integration', description: 'Seamless integration with Unreal Engine for photorealistic 3D avatars', image: '/images/ai-chat-intelligence.jpg' },
+    { icon: '👄', title: 'Ultra-Accurate Lip Sync', description: 'Precision lip-sync technology that matches speech patterns perfectly', image: '/images/ultra-accurate-lip-sync.jpg' }
   ];
 
   return (
@@ -1404,10 +1617,10 @@ function App() {
             </HeroLeft>
             <HeroRight>
               <AvatarContainer>
-                <AvatarVideo autoPlay muted loop>
-                  <source src="/video01_converted.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </AvatarVideo>
+                <AvatarImage 
+                  src="/images/paul-sir-image.png" 
+                  alt="Paul Sir - AI Avatar"
+                />
                 <FloatingPanel 
                   className="panel-1"
                   initial={{ opacity: 0, x: 20 }}
@@ -1440,8 +1653,9 @@ function App() {
         <LiveDemoSection>
           <DemoContent>
             <DemoVideoContainer>
-              <DemoVideo autoPlay muted loop>
+              <DemoVideo autoPlay muted loop playsInline>
                 <source src="/video01_converted.mp4" type="video/mp4" />
+                <source src="/video01.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </DemoVideo>
             </DemoVideoContainer>
@@ -1530,14 +1744,6 @@ function App() {
           <ShowcaseContent>
             <ShowcaseTitle>Experience the Future</ShowcaseTitle>
             <ShowcaseDescription>See how our AI avatars are revolutionizing digital communication across industries</ShowcaseDescription>
-            <div style={{ width: '100%', marginBottom: '60px' }}>
-              <div className="sc-bbSZdl doRfMC">
-                <video autoPlay loop className="sc-dhKdcy eaLKfd" style={{ width: '100%', height: 'auto' }}>
-                  <source src="/video01_converted.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </div>
             <ShowcaseGrid>
               {showcaseItems.map((item, index) => (
                 <ShowcaseCard
@@ -1558,16 +1764,8 @@ function App() {
 
         <FeaturesGrid>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ fontSize: '48px', marginBottom: '20px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontWeight: 800 }}>Powerful Features</h2>
-            <p style={{ fontSize: '18px', color: '#666', marginBottom: '40px', lineHeight: '1.8' }}>Everything you need to create amazing AI avatar experiences</p>
-            <div style={{ width: '100%', marginBottom: '40px' }}>
-              <div className="sc-bbSZdl doRfMC">
-                <video autoPlay loop className="sc-dhKdcy eaLKfd" style={{ width: '100%', height: 'auto' }}>
-                  <source src="/video01_converted.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </div>
+            <h2 style={{ fontSize: '48px', marginBottom: '20px', background: 'linear-gradient(135deg, #ffffff, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontWeight: 800 }}>Powerful Features</h2>
+            <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '40px', lineHeight: '1.8' }}>Everything you need to create amazing AI avatar experiences</p>
           </div>
           <FeatureCards>
             {features.map((feature, index) => (
@@ -1578,6 +1776,11 @@ function App() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
+                {feature.image && (
+                  <FeatureImage>
+                    <img src={feature.image} alt={feature.title} />
+                  </FeatureImage>
+                )}
                 <FeatureIcon>{feature.icon}</FeatureIcon>
                 <FeatureTitle>{feature.title}</FeatureTitle>
                 <FeatureDescription>{feature.description}</FeatureDescription>
@@ -1590,21 +1793,16 @@ function App() {
           <UsedByContent>
             <UsedByText>
               <UsedByTitle>Used by Leading Teams</UsedByTitle>
-              <p style={{ fontSize: '18px', color: '#666', marginBottom: '30px', lineHeight: '1.8' }}>
+              <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '30px', lineHeight: '1.8' }}>
                 From startups to Fortune 500 companies, thousands of teams trust Athena AI for their customer communication and internal collaboration needs.
               </p>
-              <ul style={{ listStyle: 'none', padding: 0 }}>
+              <ul style={{ listStyle: 'none', padding: 0, color: 'rgba(255, 255, 255, 0.8)' }}>
                 <li style={{ marginBottom: '15px', fontSize: '16px' }}>✓ 10M+ conversations processed daily</li>
                 <li style={{ marginBottom: '15px', fontSize: '16px' }}>✓ 99.9% uptime guarantee</li>
                 <li style={{ marginBottom: '15px', fontSize: '16px' }}>✓ 50+ countries supported</li>
                 <li style={{ fontSize: '16px' }}>✓ 45+ languages available</li>
               </ul>
             </UsedByText>
-            <UsedByImage>
-              <UsedByImageContainer>
-                <img src="/images/paul-sir-image.png" alt="Leading Teams" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </UsedByImageContainer>
-            </UsedByImage>
           </UsedByContent>
         </UsedBySection>
 
@@ -1612,15 +1810,9 @@ function App() {
           <IntegrationsContent>
             <div>
               <IntegrationsTitle>Seamless Integrations</IntegrationsTitle>
-              <p style={{ fontSize: '18px', color: '#666', marginBottom: '30px', lineHeight: '1.8' }}>
+              <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '30px', lineHeight: '1.8' }}>
                 Connect Athena AI with your favorite tools and platforms. Our extensive API ecosystem ensures you can deploy avatars wherever your customers are.
               </p>
-              <div className="sc-bbSZdl doRfMC">
-                <video autoPlay loop className="sc-dhKdcy eaLKfd">
-                  <source src="/video01_converted.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
               <IntegrationGrid>
                 {integrations.map((integration, index) => (
                   <IntegrationCard key={index}>
@@ -1630,23 +1822,12 @@ function App() {
                 ))}
               </IntegrationGrid>
             </div>
-            <div>
-              <UsedByImageContainer>
-                <HeroVideoElement autoPlay muted loop>
-                  <source src="/video01_converted.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </HeroVideoElement>
-              </UsedByImageContainer>
-            </div>
           </IntegrationsContent>
         </IntegrationsSection>
 
         <EnterpriseSection>
           <EnterpriseTitle>Enterprise-Ready</EnterpriseTitle>
           <EnterpriseSubtitle>Built for the highest standards of reliability, security, and support</EnterpriseSubtitle>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '60px' }}>
-            <img src="/images/paul-sir-image.png" alt="Enterprise Ready" style={{ maxWidth: '500px', height: 'auto', borderRadius: '20px', boxShadow: '0 20px 50px rgba(0, 0, 0, 0.1)' }} />
-          </div>
           <EnterpriseGrid>
             {enterpriseFeatures.map((feature, index) => (
               <EnterpriseCard
@@ -1657,8 +1838,8 @@ function App() {
                 whileHover={{ scale: 1.05 }}
               >
                 <div style={{ fontSize: '48px', marginBottom: '20px' }}>{feature.icon}</div>
-                <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1e293b', marginBottom: '15px' }}>{feature.title}</h3>
-                <p style={{ color: '#666', lineHeight: '1.6' }}>{feature.description}</p>
+                <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#ffffff', marginBottom: '15px' }}>{feature.title}</h3>
+                <p style={{ color: 'rgba(255, 255, 255, 0.6)', lineHeight: '1.6' }}>{feature.description}</p>
               </EnterpriseCard>
             ))}
           </EnterpriseGrid>
@@ -1666,9 +1847,6 @@ function App() {
 
         <TestimonialsSection>
           <TestimonialsTitle>What Our Customers Say</TestimonialsTitle>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '60px' }}>
-            <img src="/images/paul-sir-image.png" alt="Customer Testimonials" style={{ maxWidth: '400px', height: 'auto', borderRadius: '20px', boxShadow: '0 20px 50px rgba(255, 255, 255, 0.2)' }} />
-          </div>
           <TestimonialsGrid>
             {testimonials.map((testimonial, index) => (
               <TestimonialCard
@@ -1710,23 +1888,67 @@ function App() {
         </FAQSection>
 
         <CTASection>
-          <CTATitle>Ready to Transform Your Communication?</CTATitle>
+          <CTATitle>Start Building Real-Time AI Avatars Today</CTATitle>
           <CTADescription>Join thousands of enterprise customers using Athena for real-time AI interactions</CTADescription>
-          <CTASectionButton onClick={openChatbot}>Start Free Trial Today</CTASectionButton>
+          <CTASectionButton onClick={openChatbot}>Launch Demo</CTASectionButton>
         </CTASection>
+
+        <WhyDifferentSection>
+          <WhyDifferentTitle>Why We're Different</WhyDifferentTitle>
+          <WhyDifferentGrid>
+            <WhyDifferentCard
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="icon">⚡</div>
+              <h3>Ultra-Low Latency</h3>
+              <p>End-to-end response time under 150ms for seamless real-time conversations</p>
+            </WhyDifferentCard>
+            <WhyDifferentCard
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="icon">🧬</div>
+              <h3>Modular AI Pipeline</h3>
+              <p>Swap STT, LLM, TTS, and avatar engines independently for maximum flexibility</p>
+            </WhyDifferentCard>
+            <WhyDifferentCard
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="icon">🌍</div>
+              <h3>Multi-Avatar System</h3>
+              <p>Support multiple concurrent avatar instances with global edge deployment</p>
+            </WhyDifferentCard>
+          </WhyDifferentGrid>
+        </WhyDifferentSection>
       </Main>
       
       <Footer>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', marginBottom: '30px' }}>
-            <img src="/public/images/image1.webp" alt="Athena AI Footer" style={{ maxWidth: '300px', height: 'auto', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }} />
-            <div style={{ textAlign: 'center' }}>
-              <h3 style={{ fontSize: '24px', fontWeight: '600', color: '#1e293b', marginBottom: '10px' }}>Athena AI Platform</h3>
-              <p style={{ color: '#64748b', marginBottom: '20px' }}>Transform your communication with photorealistic AI avatars</p>
-              <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                <span style={{ fontSize: '14px', color: '#64748b' }}>© 2026 Athena AI</span>
-                <span style={{ fontSize: '14px', color: '#64748b' }}>•</span>
-                <span style={{ fontSize: '14px', color: '#64748b' }}>Enterprise Avatar Platform</span>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', marginBottom: '40px', flexWrap: 'wrap' }}>
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '28px', fontWeight: '800', background: 'linear-gradient(135deg, #8B5CF6, #3B82F6, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '10px' }}>📚 ATHENA AI</h3>
+                <p style={{ color: 'rgba(255, 255, 255, 0.5)', marginBottom: '24px', fontSize: '15px' }}>Transform your communication with photorealistic AI avatars</p>
               </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '30px', flexWrap: 'wrap' }}>
+              <a href="#" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none', fontSize: '14px', transition: 'color 0.3s' }}>GitHub</a>
+              <a href="#" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none', fontSize: '14px' }}>Documentation</a>
+              <a href="#" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none', fontSize: '14px' }}>Twitter</a>
+              <a href="#" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none', fontSize: '14px' }}>LinkedIn</a>
+              <a href="#" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none', fontSize: '14px' }}>Contact</a>
+            </div>
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '24px', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.35)' }}>© 2026 Athena AI. All rights reserved.</span>
+              <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+              <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.35)' }}>Enterprise Avatar Platform</span>
             </div>
           </div>
         </Footer>
@@ -1746,7 +1968,7 @@ function App() {
                     <>
                       <VideoAvatar autoPlay muted loop>
                         <source src="/video01.mp4" type="video/mp4" />
-                        <source src="/video01_converted.mp4" type="video/mp4" />
+                        <source src="/video01.mp4" type="video/mp4" />
                         Your browser does not support the video tag.
                       </VideoAvatar>
                       <VideoControls>
@@ -1760,9 +1982,9 @@ function App() {
                     </>
                   ) : (
                     <>
-                      <AvatarImage>
+                      <ChatAvatarIcon>
                         <img src="/images/paul-sir-image.png" alt="Athena AI Assistant" />
-                      </AvatarImage>
+                      </ChatAvatarIcon>
                       <VideoControls>
                         <ControlButton onClick={toggleVideo}>
                           <Video size={12} />
@@ -1793,9 +2015,9 @@ function App() {
               {messages.map((message, index) => (
                 <MessageContainer key={index} style={message.type === 'user' ? { marginLeft: 'auto' } : {}}>
                   {message.type === 'bot' && (
-                    <AvatarImage style={{ width: '40px', height: '40px' }}>
+                    <ChatAvatarIcon style={{ width: '40px', height: '40px' }}>
                       <img src="/images/paul-sir-image.png" alt="Athena AI Assistant" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                    </AvatarImage>
+                    </ChatAvatarIcon>
                   )}
                   {message.type === 'user' ? (
                     <UserMessage>{message.text}</UserMessage>
@@ -1807,9 +2029,9 @@ function App() {
               
               {isTyping && (
                 <MessageContainer>
-                  <AvatarImage style={{ width: '40px', height: '40px' }}>
+                  <ChatAvatarIcon style={{ width: '40px', height: '40px' }}>
                     <img src="/images/paul-sir-image.png" alt="Athena AI Assistant" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                  </AvatarImage>
+                  </ChatAvatarIcon>
                   <BotMessage>
                     <div style={{ display: 'flex', gap: '4px' }}>
                       <div style={{ width: '8px', height: '8px', background: '#666', borderRadius: '50%', animation: 'typing 1.4s infinite' }}></div>
