@@ -1,13 +1,42 @@
-flask==2.3.3
-flask-cors==4.0.0
-python-dotenv==1.0.0
-requests==2.31.0
-sqlalchemy==2.0.21
-redis==5.0.0
-pyjwt==2.8.0
-bcrypt==4.0.1
-gunicorn==21.2.0
+# ============================================
+# Athena AI Avatar Chatbot SaaS — Requirements
+# ============================================
 
-# TTS/STT dependencies
+# --- FastAPI & Server ---
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+websockets>=12.0
+
+# --- Pydantic ---
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# --- Database (async) ---
+sqlalchemy[asyncio]>=2.0.21
+aiosqlite>=0.19.0
+# For PostgreSQL production:
+# asyncpg>=0.29.0
+
+# --- Auth & Security ---
+pyjwt>=2.8.0
+bcrypt>=4.0.1
+python-dotenv>=1.0.0
+
+# --- HTTP client ---
+httpx>=0.25.0
+requests>=2.31.0
+
+# --- LLM providers ---
+openai>=1.10.0
+google-generativeai>=0.3.0
+
+# --- TTS / STT ---
 edge-tts>=6.1.0
 openai-whisper>=20231117
+
+# --- Redis (optional) ---
+redis>=5.0.0
+
+# --- Production ---
+gunicorn>=21.2.0
