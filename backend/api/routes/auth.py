@@ -10,7 +10,7 @@ from api.core.database import get_db
 from api.core.security import hash_password, verify_password, create_access_token
 from api.models.models import User
 from api.schemas.schemas import (
-    RegisterRequest, LoginRequest, TokenResponse, UserResponse,
+    RegisterRequest, LoginRequest, TokenResponse, UserResponse, UserUpdate,
 )
 
 from api.dependencies import get_current_user
@@ -62,4 +62,19 @@ async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 async def get_me(user: User = Depends(get_current_user)):
     """Get current user profile."""
+    return user
+
+
+@router.patch("/me", response_model=UserResponse)
+async def update_me(
+    body: UserUpdate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update current user profile."""
+    update_data = body.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    await db.flush()
+    await db.refresh(user)
     return user

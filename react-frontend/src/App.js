@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Video, VideoOff, Mic, MicOff } from 'lucide-react';
+import { MessageCircle, X, Send, Video, VideoOff, Mic, MicOff, LogIn, LayoutDashboard, Settings } from 'lucide-react';
 import axios from 'axios';
 import './App.css';
 import FeatureCards from './FeatureCards';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { chatAPI, ChatWebSocket, TTSWebSocket, healthAPI } from './services/api';
+import AuthPage from './pages/AuthPage';
+import DashboardPage from './pages/DashboardPage';
+import SettingsPage from './pages/SettingsPage';
 
 // Styled Components
 const Container = styled.div`
@@ -1415,7 +1420,44 @@ const WhyDifferentCard = styled(motion.div)`
   }
 `;
 
+const NavStatus = styled.span`
+  font-size: 12px;
+  color: ${p => p.$online ? '#22c55e' : 'rgba(255,255,255,0.4)'};
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: ${p => p.$online ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.05)'};
+  border: 1px solid ${p => p.$online ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.1)'};
+`;
+
+// Auth-aware nav buttons
+function AuthButtons({ onNavigate }) {
+  const { isAuthenticated, user } = useAuth();
+  
+  if (isAuthenticated) {
+    return (
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <CTAButton onClick={() => onNavigate('settings')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Settings size={16} /> Settings
+        </CTAButton>
+        <CTAButton onClick={() => onNavigate('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <LayoutDashboard size={16} /> Dashboard
+        </CTAButton>
+        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>{user?.name || user?.email}</span>
+      </div>
+    );
+  }
+  
+  return (
+    <div style={{ display: 'flex', gap: '10px' }}>
+      <CTAButton onClick={() => onNavigate('auth')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <LogIn size={16} /> Sign In
+      </CTAButton>
+    </div>
+  );
+}
+
 function App() {
+  const [currentPage, setCurrentPage] = useState('home');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
     { type: 'bot', text: 'Hello! I\'m Athena, your AI assistant. How can I help you today?' }
@@ -1425,9 +1467,67 @@ function App() {
   const [isVideoEnabled, setIsVideoEnabled] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [expandedFAQ, setExpandedFAQ] = useState(null);
+  const [backendStatus, setBackendStatus] = useState('checking');
+  const [wsChat, setWsChat] = useState(null);
+  const [useWebSocket, setUseWebSocket] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  // Handle OAuth callback from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('athena_token', token);
+      const name = params.get('name') || '';
+      const email = params.get('email') || '';
+      localStorage.setItem('athena_user', JSON.stringify({ name, email }));
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setCurrentPage('dashboard');
+    }
+    // Check if path contains auth callback
+    if (window.location.pathname.includes('/auth/callback')) {
+      setCurrentPage('dashboard');
+    }
+  }, []);
+
+  // Check backend health
+  useEffect(() => {
+    healthAPI.check()
+      .then(() => setBackendStatus('online'))
+      .catch(() => setBackendStatus('offline'));
+  }, []);
+
+  // Try to establish WebSocket connection
+  useEffect(() => {
+    if (!isChatOpen) return;
+    
+    const ws = new ChatWebSocket((data) => {
+      if (data.type === 'chunk') {
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+          if (last && last.type === 'bot' && last.streaming) {
+            return [...prev.slice(0, -1), { ...last, text: last.text + data.content }];
+          }
+          return [...prev, { type: 'bot', text: data.content, streaming: true }];
+        });
+      } else if (data.type === 'done') {
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+          if (last && last.streaming) {
+            return [...prev.slice(0, -1), { ...last, streaming: false }];
+          }
+          return prev;
+        });
+        setIsTyping(false);
+      }
+    });
+
+    ws.connect()
+      .then(() => { setWsChat(ws); setUseWebSocket(true); })
+      .catch(() => { setUseWebSocket(false); });
+
+    return () => ws.close();
+  }, [isChatOpen]);
 
   // Data for all sections
   const showcaseItems = [
@@ -1509,17 +1609,18 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
-  const callPythonBackend = async (message) => {
+  const callPythonBackend = async (message, settings = {}) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/chat`, {
-        message: message,
-        video_enabled: isVideoEnabled,
-        audio_enabled: isAudioEnabled
+      const response = await chatAPI.send(message, {
+        model: settings.model,
+        temperature: settings.temperature,
+        max_tokens: settings.maxTokens,
+        prompt_template: settings.promptTemplate,
+        emotion: settings.emotion,
       });
-      
       return response.data.message || response.data.response;
     } catch (error) {
-      console.log('Python backend not available, using fallback responses');
+      console.log('Backend not available, using fallback responses');
       return null;
     }
   };
@@ -1527,11 +1628,27 @@ function App() {
   const handleSendMessage = async () => {
     if (inputValue.trim()) {
       const userMessage = { type: 'user', text: inputValue };
-      setMessages([...messages, userMessage]);
+      setMessages(prev => [...prev, userMessage]);
+      const currentInput = inputValue;
       setInputValue('');
       setIsTyping(true);
 
-      const botResponse = await callPythonBackend(inputValue);
+      // Try WebSocket first
+      if (useWebSocket && wsChat) {
+        const settings = JSON.parse(localStorage.getItem('athena_settings') || '{}');
+        wsChat.send(currentInput, {
+          stream: true,
+          model: settings.model,
+          temperature: settings.temperature,
+          session_id: 'default',
+        });
+        return;
+      }
+
+      // Fallback to REST API
+      // Fallback to REST API with settings
+      const settings = JSON.parse(localStorage.getItem('athena_settings') || '{}');
+      const botResponse = await callPythonBackend(currentInput, settings);
       
       setTimeout(() => {
         let responseText;
@@ -1580,6 +1697,26 @@ function App() {
     setIsChatOpen(true);
   };
 
+  const navigate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  // ── Render Auth Page ──
+  if (currentPage === 'auth') {
+    return <AuthPage onNavigate={navigate} />;
+  }
+
+  // ── Render Dashboard ──
+  if (currentPage === 'dashboard') {
+    return <DashboardPage onNavigate={navigate} />;
+  }
+
+  // ── Render Settings Page ──
+  if (currentPage === 'settings') {
+    return <SettingsPage onNavigate={navigate} />;
+  }
+
   const features = [
     { icon: '🔊', title: 'Real-Time Voice Processing', description: 'Advanced speech-to-text with ultra-low latency and high accuracy for natural conversations', image: '/images/real-time-voice-processing.jpg' },
     { icon: '🤖', title: 'AI Chat Intelligence', description: 'Powered by cutting-edge LLM technology for intelligent, context-aware responses', image: '/images/ai-chat-intelligence.png' },
@@ -1591,7 +1728,12 @@ function App() {
     <Container>
       <Navigation>
         <Logo>📚 ATHENA AI</Logo>
-        <CTAButton>Get Started</CTAButton>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <NavStatus $online={backendStatus === 'online'}>
+            {backendStatus === 'online' ? '● Online' : backendStatus === 'offline' ? '○ Offline' : '◌ Checking...'}
+          </NavStatus>
+          <AuthButtons onNavigate={navigate} />
+        </div>
       </Navigation>
       
       <Main>
@@ -1891,6 +2033,9 @@ function App() {
           <CTATitle>Start Building Real-Time AI Avatars Today</CTATitle>
           <CTADescription>Join thousands of enterprise customers using Athena for real-time AI interactions</CTADescription>
           <CTASectionButton onClick={openChatbot}>Launch Demo</CTASectionButton>
+          <CTASectionButton onClick={() => navigate('auth')} style={{ marginLeft: '16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: 'none', animation: 'none' }}>
+            Get Started Free
+          </CTASectionButton>
         </CTASection>
 
         <WhyDifferentSection>
@@ -2050,7 +2195,7 @@ function App() {
                 placeholder="Type your message..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
               />
               <SendButton onClick={handleSendMessage}>
                 <Send size={20} />
@@ -2073,4 +2218,13 @@ function App() {
   );
 }
 
-export default App;
+// Wrap App in AuthProvider
+function AppWithAuth() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default AppWithAuth;

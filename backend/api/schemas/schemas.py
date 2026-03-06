@@ -116,7 +116,12 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
     chatbot_id: Optional[str] = None
     session_id: Optional[str] = None
+    model: Optional[str] = None
+    temperature: float = 0.7
+    max_tokens: int = 1024
     stream: bool = False
+    prompt_template: Optional[str] = None
+    emotion: str = "neutral"
 
 
 class ChatResponse(BaseModel):
@@ -124,6 +129,8 @@ class ChatResponse(BaseModel):
     session_id: str
     tokens_used: int = 0
     latency_ms: float = 0.0
+    model: str = "unknown"
+    provider: str = "unknown"
     timestamp: datetime
 
 
@@ -141,6 +148,8 @@ class ChatCompletionRequest(BaseModel):
 class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
     voice: str = "en-US-GuyNeural"
+    speed: Optional[str] = None   # e.g. "+10%", "-5%"
+    pitch: Optional[str] = None   # e.g. "+5Hz", "-10Hz"
     base64: bool = False
 
 

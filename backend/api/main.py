@@ -15,8 +15,10 @@ from api.core.config import get_settings
 from api.core.database import init_db
 
 # ---- Route imports ----
-from api.routes import auth, chat, tts, stt, chatbots, api_keys, avatar, models
+from api.routes import auth, chat, tts, stt, chatbots, api_keys, avatar, models, usage, auth_proxy
+from api.routes import oauth
 from api.websocket import handlers as ws_handlers
+from api.middleware.rate_limiter import RateLimitMiddleware
 
 settings = get_settings()
 
@@ -62,10 +64,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---- Rate Limiting ----
+app.add_middleware(RateLimitMiddleware)
+
 
 # ---- Mount Routers ----
 
 app.include_router(auth.router)
+app.include_router(auth_proxy.router)  # Proxy to Node.js auth-service
 app.include_router(chat.router)
 app.include_router(tts.router)
 app.include_router(stt.router)
@@ -73,6 +79,8 @@ app.include_router(chatbots.router)
 app.include_router(api_keys.router)
 app.include_router(avatar.router)
 app.include_router(models.router)
+app.include_router(oauth.router)
+app.include_router(usage.router)
 app.include_router(ws_handlers.router)
 
 

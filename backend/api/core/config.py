@@ -31,14 +31,23 @@ class Settings(BaseSettings):
     # ── LLM / AI ─────────────────────────────────────
     OPENAI_API_KEY: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
-    DEFAULT_LLM_MODEL: str = "gpt-3.5-turbo"
-    DEFAULT_SYSTEM_PROMPT: str = (
-        "You are Athena, an advanced AI assistant created by Athena AI. "
-        "You are helpful, accurate, and conversational."
-    )
+    GROQ_API_KEY: Optional[str] = None
+    DEFAULT_LLM_MODEL: str = "groq/llama-3.3-70b-versatile"
+    DEFAULT_SYSTEM_PROMPT: str = "avatar_conversational"  # prompt template name
+
+    # ── Streaming / Latency ───────────────────────────
+    STREAM_CHUNK_SIZE: int = 25  # max words per TTS chunk
+    TARGET_FIRST_TOKEN_MS: int = 500
+    TARGET_TTS_CHUNK_MS: int = 400
+
+    # ── Memory ───────────────────────────────────────
+    MEMORY_BUFFER_SIZE: int = 20  # short-term conversation turns
+    ENABLE_LONG_TERM_MEMORY: bool = False
 
     # ── TTS ──────────────────────────────────────────
     TTS_VOICE: str = "en-US-GuyNeural"
+    TTS_SPEED: str = "+0%"
+    TTS_PITCH: str = "+0Hz"
 
     # ── STT ──────────────────────────────────────────
     WHISPER_MODEL: str = "base"

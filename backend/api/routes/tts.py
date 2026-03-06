@@ -1,5 +1,5 @@
 """
-TTS routes — text-to-speech synthesis.
+TTS routes — text-to-speech synthesis with streaming and voice management.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -21,6 +21,8 @@ async def text_to_speech(body: TTSRequest):
     result = await tts_service.synthesize_speech(
         text=body.text,
         voice=body.voice,
+        speed=body.speed,
+        pitch=body.pitch,
         return_base64=body.base64,
     )
 
@@ -51,14 +53,22 @@ async def list_voices(locale: str = "en"):
     return {"voices": voices, "default": "en-US-GuyNeural"}
 
 
+@router.get("/api/tts/voices/categories")
+async def get_voice_categories():
+    """Get organised voice categories (male/female) for the UI."""
+    return tts_service.get_voice_categories()
+
+
 @router.post("/api/tts/stream")
 async def stream_tts(body: TTSRequest):
-    """Stream TTS audio chunks for real-time playback."""
+    """Stream TTS audio chunks for real-time playback (200-400ms target)."""
     if not tts_service.is_available():
         raise HTTPException(status_code=503, detail="TTS not available")
 
     async def audio_stream():
-        async for chunk in tts_service.stream_speech(body.text, body.voice):
+        async for chunk in tts_service.stream_speech(
+            body.text, body.voice, speed=body.speed, pitch=body.pitch
+        ):
             yield chunk
 
     return StreamingResponse(audio_stream(), media_type="audio/mpeg")

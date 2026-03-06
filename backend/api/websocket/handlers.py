@@ -1,15 +1,19 @@
 """
-WebSocket endpoints — real-time chat, TTS streaming, avatar frames.
+WebSocket endpoints — real-time streaming chat, TTS, avatar frames.
+Implements the full pipeline: User -> STT -> LLM -> TTS -> LipSync -> Avatar -> Browser
 """
 
 import json
 import asyncio
+import time
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import Dict, Set
 
 from api.services import chat_service, tts_service, avatar_service
+from api.services.memory_service import get_memory
 
 router = APIRouter()
+memory = get_memory()
 
 # ---- Connection Manager ----
 
@@ -46,14 +50,22 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-# ---- Chat WebSocket ----
+# ---- Chat WebSocket (Streaming with Memory) ----
 
 @router.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
     """
-    Real-time chat via WebSocket.
-    Client sends: {"message": "Hello", "session_id": "...", "stream": true}
-    Server sends: {"type": "chunk", "content": "..."} or {"type": "done", "content": "..."}
+    Real-time streaming chat via WebSocket with conversation memory.
+    
+    Client sends:
+      {"message": "Hello", "session_id": "...", "model": "groq/llama-3.3-70b-versatile",
+       "stream": true, "temperature": 0.7}
+    
+    Server sends:
+      {"type": "start", "timestamp": ...}
+      {"type": "chunk", "content": "..."}
+      {"type": "sentence", "content": "..."}     (for TTS pipeline)
+      {"type": "done", "content": "...", "latency_ms": ..., "provider": "..."}
     """
     await manager.connect(websocket, "chat")
     try:
@@ -61,28 +73,93 @@ async def websocket_chat(websocket: WebSocket):
             raw = await websocket.receive_text()
             data = json.loads(raw)
             message = data.get("message", "")
+            session_id = data.get("session_id", "default")
+            model = data.get("model", None)
             stream = data.get("stream", True)
+            temperature = data.get("temperature", 0.7)
 
-            messages = [{"role": "user", "content": message}]
+            # Build context with memory
+            context_messages = memory.get_context_window(
+                session_id=session_id,
+                system_prompt="",
+                user_message=message,
+            )
+            context_messages = [m for m in context_messages if m.get("content")]
+
+            start_time = time.time()
+            await manager.send_json(websocket, {
+                "type": "start",
+                "timestamp": start_time,
+            })
 
             if stream:
                 full_content = ""
-                async for chunk in chat_service.chat_completion_stream(messages):
+                sentence_buffer = ""
+                first_token = True
+
+                async for chunk in chat_service.chat_completion_stream(
+                    context_messages, model=model, temperature=temperature
+                ):
+                    if first_token:
+                        first_token_ms = (time.time() - start_time) * 1000
+                        await manager.send_json(websocket, {
+                            "type": "first_token",
+                            "latency_ms": round(first_token_ms, 1),
+                        })
+                        first_token = False
+
                     full_content += chunk
+                    sentence_buffer += chunk
+
+                    # Send raw token
                     await manager.send_json(websocket, {
                         "type": "chunk",
                         "content": chunk,
                     })
+
+                    # Check for sentence boundaries (for TTS pipeline)
+                    for sep in [". ", "! ", "? ", ".\n", "!\n", "?\n"]:
+                        while sep in sentence_buffer:
+                            idx = sentence_buffer.find(sep)
+                            sentence = sentence_buffer[:idx + 1].strip()
+                            sentence_buffer = sentence_buffer[idx + len(sep):]
+                            if sentence:
+                                await manager.send_json(websocket, {
+                                    "type": "sentence",
+                                    "content": sentence,
+                                })
+
+                # Flush remaining sentence buffer
+                if sentence_buffer.strip():
+                    await manager.send_json(websocket, {
+                        "type": "sentence",
+                        "content": sentence_buffer.strip(),
+                    })
+
+                # Store in memory
+                memory.add_turn(session_id, "user", message)
+                memory.add_turn(session_id, "assistant", full_content)
+
+                total_ms = (time.time() - start_time) * 1000
                 await manager.send_json(websocket, {
                     "type": "done",
                     "content": full_content,
+                    "latency_ms": round(total_ms, 1),
                 })
             else:
-                result = await chat_service.chat_completion(messages)
+                result = await chat_service.chat_completion(
+                    context_messages, model=model, temperature=temperature
+                )
+                memory.add_turn(session_id, "user", message)
+                memory.add_turn(session_id, "assistant", result["content"])
+
                 await manager.send_json(websocket, {
                     "type": "done",
                     "content": result["content"],
                     "tokens": result.get("tokens", 0),
+                    "latency_ms": result.get("latency_ms", 0),
+                    "provider": result.get("provider", "unknown"),
+                    "model": result.get("model", "unknown"),
                 })
 
     except WebSocketDisconnect:
