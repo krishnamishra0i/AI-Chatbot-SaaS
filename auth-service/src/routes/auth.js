@@ -25,16 +25,19 @@ router.post('/signup', otpLimiter, async (req, res) => {
     if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 chars' });
 
     const User = getUser();
-    const existing = await User.findOne({ email: email.toLowerCase() });
-    if (existing) return res.status(409).json({ error: 'Email already registered' });
+    // const existing = await User.findOne({ email: email.toLowerCase() });
+    // if (existing) return res.status(409).json({ error: 'Email already registered' });
 
     const hashed = await bcrypt.hash(password, 12);
     const otp = generateOtp(parseInt(process.env.OTP_LENGTH || '6', 10));
+    console.log('OTP:', otp);
+    
     const otpExpiry = new Date(Date.now() + (parseInt(process.env.OTP_TTL_MINUTES || '10', 10) * 60 * 1000));
 
     const user = await User.create({ name, email: email.toLowerCase(), password: hashed, otp, otpExpiry });
-
-    if (process.env.DISABLE_EMAIL !== 'true') await sendOtpEmail(user.email, otp);
+    await sendOtpEmail(user.email, otp);
+    // console.log(res);
+    // if (process.env.DISABLE_EMAIL !== 'true') await sendOtpEmail(user.email, otp);
 
     return res.status(201).json({ message: 'User created, OTP sent', user_id: user._id });
   } catch (err) {

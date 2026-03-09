@@ -24,7 +24,7 @@ app.use(passport.session());
 // Global flag: are we using MongoDB or in-memory?
 global.USE_MEMORY_STORE = false;
 
-const PORT = process.env.PORT || 4000;
+const PORT =  5000;
 
 function buildMongoUri() {
   if (process.env.MONGODB_URI) return process.env.MONGODB_URI;
@@ -33,8 +33,16 @@ function buildMongoUri() {
   const cluster = process.env.MONGODB_CLUSTER || '';
   const db = process.env.MONGODB_DB || 'athena_auth';
   if (!user || !pass || !cluster) return null;
-  return `mongodb+srv://${user}:${pass}@${cluster}/${db}?retryWrites=true&w=majority`;
+  return `mongodb://localhost:27017/${process.env.MONGODB_DB || 'athena_auth'}`;
 }
+
+// const connection = mongoose.connection(`mongodb://localhost:27017/${process.env.MONGODB_DB || 'athena_auth'}`);
+// connection.on('error', (err) => {
+//   console.warn(`MongoDB connection error: ${err.message}`);
+//   console.warn('Falling back to in-memory storage (dev mode)');
+//   global.USE_MEMORY_STORE = true;
+// });
+
 
 async function start() {
   const mongoUri = buildMongoUri();
@@ -60,7 +68,7 @@ async function start() {
   // Routes (loaded after db decision so models resolve correctly)
   const authRoutes = require('./routes/auth');
   const supportRoutes = require('./routes/support');
-  app.use('/auth', authRoutes);
+  app.use('/api/auth', authRoutes);
   app.use('/support', supportRoutes);
 
   app.get('/health', (req, res) => res.json({

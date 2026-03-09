@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer');
 
 const createTransport = () => {
-  if (process.env.DISABLE_EMAIL === 'true') {
-    return { sendMail: (opts) => { console.log('Email disabled - would send:', opts); return Promise.resolve(); } };
-  }
+  // if (process.env.DISABLE_EMAIL === 'true') {
+  //   return { sendMail: (opts) => { console.log('Email disabled - would send:', opts); return Promise.resolve(); } };
+  // }
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT || '587', 10),
