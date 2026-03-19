@@ -232,7 +232,7 @@ export default function AuthPage({ onNavigate }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Logo>ATHENA AI</Logo>
+        <Logo>ATHENA Chatbot AI</Logo>
         <Title>{isLogin ? 'Welcome Back' : 'Create Account'}</Title>
         <Subtitle>{isLogin ? 'Sign in to your account' : 'Start your AI avatar journey'}</Subtitle>
 
