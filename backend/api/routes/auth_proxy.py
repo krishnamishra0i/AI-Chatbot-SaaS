@@ -69,6 +69,23 @@ async def login(req: LoginRequest):
     })
 
 
+@router.post("/send-login-otp")
+async def send_login_otp(req: ResendOTPRequest):
+    """Send OTP for login - proxied to auth-service"""
+    return await proxy_auth_request("POST", "/auth/send-login-otp", {
+        "email": req.email
+    })
+
+
+@router.post("/verify-login-otp")
+async def verify_login_otp(req: OTPRequest):
+    """Verify OTP for login - proxied to auth-service"""
+    return await proxy_auth_request("POST", "/auth/verify-login-otp", {
+        "email": req.email,
+        "otp": req.otp
+    })
+
+
 @router.post("/refresh")
 async def refresh_token(req: RefreshTokenRequest):
     """Refresh access token - proxied to auth-service"""

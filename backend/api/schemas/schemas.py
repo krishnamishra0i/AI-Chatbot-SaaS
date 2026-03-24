@@ -147,10 +147,11 @@ class ChatCompletionRequest(BaseModel):
 
 class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
-    voice: str = "en-US-GuyNeural"
-    speed: Optional[str] = None   # e.g. "+10%", "-5%"
-    pitch: Optional[str] = None   # e.g. "+5Hz", "-10Hz"
+    voice: str = "nova"  # OpenAI voices
+    speed: Optional[float | str] = None  # Accept both numeric and legacy string values
+    pitch: Optional[float | str] = None  # Accept both numeric and legacy string values
     base64: bool = False
+    model: Optional[str] = None  # Optional model override
 
 
 class TTSResponse(BaseModel):

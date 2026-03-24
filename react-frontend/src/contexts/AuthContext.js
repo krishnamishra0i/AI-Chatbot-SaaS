@@ -42,20 +42,20 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const res = await authAPI.login(email, password);
-    const { access_token, user: userData } = res.data;
-    localStorage.setItem('athena_token', access_token);
+    const { access_token: accessToken, user: userData } = res.data;
+    localStorage.setItem('athena_token', accessToken);
     localStorage.setItem('athena_user', JSON.stringify(userData));
-    setToken(access_token);
+    setToken(accessToken);
     setUser(userData);
     return userData;
   }, []);
 
   const register = useCallback(async (email, password, name) => {
     const res = await authAPI.register(email, password, name);
-    const { access_token, user: userData } = res.data;
-    localStorage.setItem('athena_token', access_token);
+    const { access_token: accessToken, user: userData } = res.data;
+    localStorage.setItem('athena_token', accessToken);
     localStorage.setItem('athena_user', JSON.stringify(userData));
-    setToken(access_token);
+    setToken(accessToken);
     setUser(userData);
     return userData;
   }, []);
@@ -77,6 +77,13 @@ export function AuthProvider({ children }) {
     authAPI.getMe().then(res => setUser(res.data)).catch(() => {});
   }, []);
 
+  const handleOTPVerification = useCallback((token, userData) => {
+    localStorage.setItem('athena_token', token);
+    localStorage.setItem('athena_user', JSON.stringify(userData));
+    setToken(token);
+    setUser(userData);
+  }, []);
+
   const value = {
     user,
     token,
@@ -86,6 +93,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     handleOAuthCallback,
+    handleOTPVerification,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

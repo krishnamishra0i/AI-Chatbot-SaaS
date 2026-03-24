@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { chatbotsAPI, apiKeysAPI, usageAPI, modelsAPI } from '../services/api';
+import ChatModalAdvanced from './ChatModalAdvanced';
 
 // ── Styled Components ────────────────────────────────
 
@@ -286,6 +287,7 @@ export default function DashboardPage({ onNavigate }) {
   const [showCreateKey, setShowCreateKey] = useState(false);
   const [newKeyResult, setNewKeyResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedChatbot, setSelectedChatbot] = useState(null);
 
   // Form state
   const [botForm, setBotForm] = useState({
@@ -296,18 +298,46 @@ export default function DashboardPage({ onNavigate }) {
 
   const loadData = useCallback(async () => {
     try {
-      const [botsRes, keysRes, usageRes, modelsRes] = await Promise.all([
-        chatbotsAPI.list().catch(() => ({ data: [] })),
-        apiKeysAPI.list().catch(() => ({ data: [] })),
-        usageAPI.summary().catch(() => ({ data: null })),
-        modelsAPI.list().catch(() => ({ data: { data: [] } })),
-      ]);
+      console.log('[Dashboard] Loading data...');
+      
+      // Load chatbots
+      const botsRes = await chatbotsAPI.list().catch((err) => {
+        console.error('[Dashboard] Failed to load chatbots:', err);
+        return { data: [] };
+      });
+      
+      // Load API keys
+      const keysRes = await apiKeysAPI.list().catch((err) => {
+        console.error('[Dashboard] Failed to load API keys:', err);
+        return { data: [] };
+      });
+      
+      // Load usage (non-critical, skip if fails)
+      let usageData = null;
+      try {
+        const usageRes = await usageAPI.summary();
+        usageData = usageRes.data;
+        console.log('[Dashboard] Usage data loaded');
+      } catch (err) {
+        console.warn('[Dashboard] Usage API failed (non-critical):', err.response?.status, err.response?.data?.detail);
+        // Continue without usage data
+        usageData = null;
+      }
+      
+      // Load models
+      const modelsRes = await modelsAPI.list().catch((err) => {
+        console.error('[Dashboard] Failed to load models:', err);
+        return { data: { data: [] } };
+      });
+      
       setChatbots(botsRes.data || []);
       setApiKeys(keysRes.data || []);
-      setUsage(usageRes.data);
+      setUsage(usageData);
       setModels(modelsRes.data?.data || []);
+      
+      console.log('[Dashboard] Data loaded successfully');
     } catch (err) {
-      console.error('Failed to load dashboard data:', err);
+      console.error('[Dashboard] Failed to load dashboard data:', err);
     }
   }, []);
 
@@ -319,12 +349,31 @@ export default function DashboardPage({ onNavigate }) {
     if (!botForm.name.trim()) return;
     setLoading(true);
     try {
+      console.log('[Dashboard] Creating chatbot with data:', botForm);
+      const token = localStorage.getItem('athena_token');
+      console.log('[Dashboard] Token status:', token ? 'Present' : 'Missing');
+      
       await chatbotsAPI.create(botForm);
+      
+      console.log('[Dashboard] Chatbot created successfully');
       setShowCreateBot(false);
-      setBotForm({ name: '', system_prompt: '', llm_model: 'gpt-3.5-turbo', voice_id: 'en-US-GuyNeural', temperature: 0.7, max_tokens: 1024 });
+      setBotForm({ name: '', system_prompt: '', llm_model: 'gpt-4o-mini', voice_id: 'en-US-GuyNeural', temperature: 0.7, max_tokens: 1024 });
       loadData();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to create chatbot');
+      console.error('[Dashboard] Chatbot creation failed:', err);
+      console.error('[Dashboard] Error details:', {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.config?.headers,
+      });
+      
+      const errorMessage = 
+        err.response?.status === 401 ? 'Authentication failed. Please check the Debug page (🔍 Debug button) - your token might not be sent correctly.' :
+        err.response?.status === 400 ? `Invalid input: ${err.response?.data?.detail || 'Please check your chatbot settings.'}` :
+        err.response?.data?.detail || err.message || 'Failed to create chatbot';
+      
+      alert(errorMessage);
     }
     setLoading(false);
   };
@@ -450,13 +499,17 @@ export default function DashboardPage({ onNavigate }) {
             ) : (
               <Grid>
                 {chatbots.map(bot => (
-                  <Card key={bot.id}>
+                  <Card 
+                    key={bot.id}
+                    onClick={() => setSelectedChatbot(bot)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                       <div>
                         <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '4px' }}>{bot.name}</h3>
                         <Badge $status={bot.status}>{bot.status}</Badge>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
                         <Btn $size="sm" $variant="secondary" onClick={() => toggleChatbotStatus(bot)}>
                           {bot.status === 'active' ? 'Pause' : 'Resume'}
                         </Btn>
@@ -473,6 +526,9 @@ export default function DashboardPage({ onNavigate }) {
                     )}
                     <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '12px' }}>
                       Created: {new Date(bot.created_at).toLocaleDateString()}
+                    </div>
+                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center', fontSize: '12px', color: 'rgba(139, 92, 246, 0.8)', fontWeight: '600' }}>
+                      💬 Click to Chat
                     </div>
                   </Card>
                 ))}
@@ -662,6 +718,16 @@ export default function DashboardPage({ onNavigate }) {
             </ModalContent>
           </Modal>
         )}
+
+        {/* Chat Modal - Advanced */}
+        <AnimatePresence>
+          {selectedChatbot && (
+            <ChatModalAdvanced 
+              bot={selectedChatbot} 
+              onClose={() => setSelectedChatbot(null)} 
+            />
+          )}
+        </AnimatePresence>
       </AnimatePresence>
     </DashContainer>
   );

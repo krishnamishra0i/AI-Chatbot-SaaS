@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.core.database import get_db
-from api.dependencies import get_current_user
+from api.dependencies import get_current_user_from_auth_service
 from api.models.models import User
 from api.schemas.schemas import UsageSummary
 from api.services import usage_service
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/usage", tags=["Usage & Analytics"])
 @router.get("/summary", response_model=UsageSummary)
 async def get_usage_summary(
     days: int = Query(30, ge=1, le=365),
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     """Get usage summary for the authenticated user."""
@@ -28,7 +28,7 @@ async def get_usage_summary(
 @router.get("/breakdown")
 async def get_usage_breakdown(
     days: int = Query(30, ge=1, le=365),
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     """Get usage breakdown by service type."""

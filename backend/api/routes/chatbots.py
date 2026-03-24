@@ -8,7 +8,7 @@ from sqlalchemy import select
 from typing import List
 
 from api.core.database import get_db
-from api.dependencies import get_current_user
+from api.dependencies import get_current_user_from_auth_service
 from api.models.models import User, Chatbot
 from api.schemas.schemas import ChatbotCreate, ChatbotUpdate, ChatbotResponse
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/chatbots", tags=["Chatbots"])
 
 @router.get("/", response_model=List[ChatbotResponse])
 async def list_chatbots(
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -29,7 +29,7 @@ async def list_chatbots(
 @router.post("/", response_model=ChatbotResponse, status_code=status.HTTP_201_CREATED)
 async def create_chatbot(
     body: ChatbotCreate,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     chatbot = Chatbot(
@@ -51,7 +51,7 @@ async def create_chatbot(
 @router.get("/{chatbot_id}", response_model=ChatbotResponse)
 async def get_chatbot(
     chatbot_id: str,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -67,7 +67,7 @@ async def get_chatbot(
 async def update_chatbot(
     chatbot_id: str,
     body: ChatbotUpdate,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -89,7 +89,7 @@ async def update_chatbot(
 @router.delete("/{chatbot_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chatbot(
     chatbot_id: str,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_from_auth_service),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(

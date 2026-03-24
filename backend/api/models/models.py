@@ -54,6 +54,10 @@ class User(Base):
     oauth_provider = Column(String, nullable=True)
     oauth_id = Column(String, nullable=True)
 
+    # OTP (One-Time Password) for passwordless login
+    otp_code = Column(String, nullable=True)  # 6-digit OTP
+    otp_expires_at = Column(DateTime, nullable=True)  # Expiration time
+
     # Relationships
     chatbots = relationship("Chatbot", back_populates="owner", cascade="all, delete-orphan")
     api_keys = relationship("ApiKey", back_populates="owner", cascade="all, delete-orphan")
@@ -68,7 +72,7 @@ class Chatbot(Base):
     owner_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     system_prompt = Column(Text, nullable=True)
-    llm_model = Column(String, default="gpt-3.5-turbo")
+    llm_model = Column(String, default="gpt-4o-mini")
     voice_id = Column(String, default="en-US-GuyNeural")
     avatar_id = Column(String, nullable=True)
     status = Column(SAEnum(ChatbotStatus), default=ChatbotStatus.ACTIVE)

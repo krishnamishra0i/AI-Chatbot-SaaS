@@ -31,11 +31,13 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expires_delta or timedelta(minutes=settings.JWT_EXPIRATION_MINUTES)
     )
     to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc)})
-    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    # Use JWT_SECRET so tokens are compatible with auth-service and frontend validation
+    return jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def decode_access_token(token: str) -> dict:
-    return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+    # Use JWT_SECRET to match token creation and auth-service standard
+    return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
 
 
 # ── API Key Generation ──────────────────────────────

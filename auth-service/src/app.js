@@ -24,7 +24,7 @@ app.use(passport.session());
 // Global flag: are we using MongoDB or in-memory?
 global.USE_MEMORY_STORE = false;
 
-const PORT =  5000;
+const PORT = process.env.PORT || 3001;
 
 function buildMongoUri() {
   if (process.env.MONGODB_URI) return process.env.MONGODB_URI;

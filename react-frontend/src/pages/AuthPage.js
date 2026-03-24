@@ -178,6 +178,33 @@ const ErrorMsg = styled.div`
   text-align: center;
 `;
 
+const LoginMethodToggle = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const MethodButton = styled.button`
+  flex: 1;
+  padding: 10px 16px;
+  background: ${p => p.$active ? 'rgba(139, 92, 246, 0.2)' : 'transparent'};
+  border: 1px solid ${p => p.$active ? 'rgba(139, 92, 246, 0.5)' : 'transparent'};
+  border-radius: 6px;
+  color: ${p => p.$active ? '#fff' : 'rgba(255,255,255,0.5)'};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  
+  &:hover {
+    color: #fff;
+  }
+`;
+
 const BackLink = styled.div`
   text-align: center;
   margin-top: 16px;
@@ -194,13 +221,16 @@ const BackLink = styled.div`
 `;
 
 export default function AuthPage({ onNavigate }) {
-  const { login, register } = useAuth();
+  const { login, handleOTPVerification } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const [useOTPLogin, setUseOTPLogin] = useState(false); // Toggle between password and OTP login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingOtpEmail, setPendingOtpEmail] = useState(null); // Track if user needs OTP verification
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -209,13 +239,88 @@ export default function AuthPage({ onNavigate }) {
 
     try {
       if (isLogin) {
-        await login(email, password);
+        if (useOTPLogin) {
+          // OTP Login - send OTP to email
+          await authAPI.sendOtp(email);
+          setPendingOtpEmail(email);
+        } else {
+          // Password Login
+          try {
+            await login(email, password);
+            onNavigate('dashboard');
+          } catch (err) {
+            // If user is OTP-only, suggest OTP login
+            if (err.response?.data?.detail?.includes('OTP login')) {
+              setError(err.response.data.detail + " Switching to OTP login...");
+              setTimeout(() => {
+                setUseOTPLogin(true);
+                setError('');
+              }, 2000);
+            } else {
+              throw err;
+            }
+          }
+        }
       } else {
-        await register(email, password, name);
+        // Signup with password
+        const res = await authAPI.signup(email, password, name);
+        const { access_token: accessToken, user: userData } = res.data;
+        localStorage.setItem('athena_token', accessToken);
+        localStorage.setItem('athena_user', JSON.stringify(userData));
+        // Redirect to dashboard
+        onNavigate('dashboard');
       }
-      onNavigate('home');
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Something went wrong. Please try again.';
+      const msg = err.response?.data?.detail || err.response?.data?.error || 'Something went wrong. Please try again.';
+      setError(msg);
+    }
+    setLoading(false);
+  };
+
+  const handleOTPSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      console.log('[AuthPage] OTP Submit - Calling verifyOtp...');
+      let res;
+      
+      if (useOTPLogin) {
+        // Login OTP verification
+        res = await authAPI.verifyOtp(pendingOtpEmail, otp);
+      } else {
+        // Signup OTP verification
+        res = await authAPI.verifyOtp(pendingOtpEmail, otp);
+      }
+      
+      console.log('[AuthPage] OTP Response received:', res);
+      console.log('[AuthPage] Response status:', res.status);
+      console.log('[AuthPage] Response data:', res.data);
+      
+      const { access_token: accessToken, user: userData } = res.data;
+      
+      console.log('[AuthPage] Extracted accessToken:', accessToken ? `${accessToken.substring(0, 20)}...` : 'UNDEFINED');
+      console.log('[AuthPage] Extracted userData:', userData);
+      
+      // Store token and redirect to dashboard
+      console.log('[AuthPage] Storing token in localStorage...');
+      localStorage.setItem('athena_token', accessToken);
+      console.log('[AuthPage] Verified stored token:', localStorage.getItem('athena_token') ? `${localStorage.getItem('athena_token').substring(0, 20)}...` : 'NOT FOUND');
+      
+      localStorage.setItem('athena_user', JSON.stringify(userData));
+      console.log('[AuthPage] Stored user:', localStorage.getItem('athena_user'));
+      
+      // Update auth context
+      console.log('[AuthPage] Calling handleOTPVerification...');
+      handleOTPVerification(accessToken, userData);
+      
+      console.log('[AuthPage] Navigating to dashboard...');
+      onNavigate('dashboard');
+    } catch (err) {
+      console.error('[AuthPage] OTP verification error:', err);
+      console.error('[AuthPage] Error response:', err.response);
+      const msg = err.response?.data?.detail || err.response?.data?.error || 'Invalid OTP. Please try again.';
       setError(msg);
     }
     setLoading(false);
@@ -233,64 +338,141 @@ export default function AuthPage({ onNavigate }) {
         transition={{ duration: 0.5 }}
       >
         <Logo>ATHENA Chatbot AI</Logo>
-        <Title>{isLogin ? 'Welcome Back' : 'Create Account'}</Title>
-        <Subtitle>{isLogin ? 'Sign in to your account' : 'Start your AI avatar journey'}</Subtitle>
+        
+        {/* OTP Verification Screen */}
+        {pendingOtpEmail ? (
+          <>
+            <Title>{useOTPLogin ? 'Verify Your Email' : 'Verify Your Email'}</Title>
+            <Subtitle>{useOTPLogin ? 'Enter the OTP sent to verify and login' : 'Check your email for the verification code'}</Subtitle>
 
-        {error && <ErrorMsg>{error}</ErrorMsg>}
+            {error && <ErrorMsg>{error}</ErrorMsg>}
 
-        <form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <Input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          )}
-          <Input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? '...' : isLogin ? 'Sign In' : 'Create Account'}
-          </Button>
-        </form>
+            <form onSubmit={handleOTPSubmit}>
+              <Input
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength="6"
+                required
+              />
+              <Button type="submit" disabled={loading || otp.length !== 6}>
+                {loading ? '...' : (useOTPLogin ? 'Login with OTP' : 'Verify Email')}
+              </Button>
+            </form>
 
-        <Divider><span>or continue with</span></Divider>
+            <Toggle>
+              Didn't receive code? 
+              <span onClick={async () => {
+                setError('');
+                try {
+                  await authAPI.sendOtp(pendingOtpEmail);
+                  setError('OTP resent! Check your email.');
+                  setOtp('');
+                } catch (err) {
+                  setError('Failed to resend OTP');
+                }
+              }}>
+                Resend
+              </span>
+            </Toggle>
 
-        <OAuthButton type="button" onClick={handleGoogleLogin}>
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Continue with Google
-        </OAuthButton>
+            <BackLink>
+              <a href="/" onClick={(e) => { e.preventDefault(); setPendingOtpEmail(null); setOtp(''); setError(''); setUseOTPLogin(false); }}>
+                ← Back to {isLogin ? 'Sign In' : 'Sign Up'}
+              </a>
+            </BackLink>
+          </>
+        ) : (
+          // Login/Signup Screen
+          <>
+            <Title>{isLogin ? 'Welcome Back' : 'Create Account'}</Title>
+            <Subtitle>{isLogin ? (useOTPLogin ? 'Verify with OTP' : 'Sign in to your account') : 'Start your AI avatar journey'}</Subtitle>
 
-        <Toggle>
-          {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <span onClick={() => { setIsLogin(!isLogin); setError(''); }}>
-            {isLogin ? 'Sign Up' : 'Sign In'}
-          </span>
-        </Toggle>
+            {error && <ErrorMsg>{error}</ErrorMsg>}
 
-        <BackLink>
-          <a href="/" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
-            ← Back to Home
-          </a>
-        </BackLink>
+            {/* Login Method Toggle */}
+            {isLogin && (
+              <LoginMethodToggle>
+                <MethodButton 
+                  $active={!useOTPLogin}
+                  onClick={() => { setUseOTPLogin(false); setError(''); setPassword(''); }}
+                >
+                  Password Login
+                </MethodButton>
+                <MethodButton 
+                  $active={useOTPLogin}
+                  onClick={() => { setUseOTPLogin(true); setError(''); }}
+                >
+                  OTP Login
+                </MethodButton>
+              </LoginMethodToggle>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              {!isLogin && (
+                <Input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              )}
+              <Input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              
+              {/* Show password field only for password login or signup */}
+              {(!isLogin || !useOTPLogin) && (
+                <Input
+                  type="password"
+                  placeholder={isLogin ? "Password" : "Password (min 6 chars)"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              )}
+              
+              <Button type="submit" disabled={loading}>
+                {loading ? '...' : isLogin ? (useOTPLogin ? 'Send OTP' : 'Sign In') : 'Create Account'}
+              </Button>
+            </form>
+
+            {isLogin && !useOTPLogin && (
+              <>
+                <Divider><span>or continue with</span></Divider>
+
+                <OAuthButton type="button" onClick={handleGoogleLogin}>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Continue with Google
+                </OAuthButton>
+              </>
+            )}
+
+            <Toggle>
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <span onClick={() => { setIsLogin(!isLogin); setError(''); setPendingOtpEmail(null); setUseOTPLogin(false); }}>
+                {isLogin ? 'Sign Up' : 'Sign In'}
+              </span>
+            </Toggle>
+
+            <BackLink>
+              <a href="/" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
+                ← Back to Home
+              </a>
+            </BackLink>
+          </>
+        )}
       </AuthCard>
     </AuthContainer>
   );

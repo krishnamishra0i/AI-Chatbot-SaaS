@@ -1,5 +1,5 @@
 """
-Text-to-Speech service using edge-tts.
+Text-to-Speech service supporting both OpenAI TTS and edge-tts.
 Supports streaming audio chunks, voice listing, speed/pitch control.
 Optimised for real-time avatar pipeline (200-400ms chunks).
 """
@@ -14,12 +14,29 @@ from api.core.config import get_settings
 
 settings = get_settings()
 
-# Module availability flag
+# Module availability flags
 try:
     import edge_tts
     EDGE_TTS_AVAILABLE = True
 except ImportError:
     EDGE_TTS_AVAILABLE = False
+
+# OpenAI TTS
+try:
+    from openai import AsyncOpenAI
+    OPENAI_TTS_AVAILABLE = True
+except ImportError:
+    OPENAI_TTS_AVAILABLE = False
+
+_openai_client = None
+
+def _get_openai_client():
+    global _openai_client
+    if _openai_client is None:
+        if not OPENAI_TTS_AVAILABLE:
+            raise RuntimeError("openai package not installed. Run: pip install openai")
+        _openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    return _openai_client
 
 
 async def synthesize_speech(
@@ -30,12 +47,67 @@ async def synthesize_speech(
     return_base64: bool = False,
 ) -> dict:
     """
-    Convert text to speech. Returns audio bytes or base64 string.
+    Convert text to speech using configured provider (OpenAI or edge-tts).
+    Returns audio bytes or base64 string.
     """
+    provider = settings.TTS_PROVIDER.lower()
+    voice = voice or settings.TTS_VOICE
+
+    if provider == "openai":
+        return await _synthesize_openai(text, voice, return_base64)
+    else:
+        return await _synthesize_edge(text, voice, speed, pitch, return_base64)
+
+
+async def _synthesize_openai(
+    text: str,
+    voice: str = "alloy",
+    return_base64: bool = False,
+) -> dict:
+    """OpenAI TTS synthesis."""
+    client = _get_openai_client()
+    start = time.time()
+    
+    response = await client.audio.speech.create(
+        model=settings.TTS_MODEL,  # tts-1 (cheap) or tts-1-hd (high-quality)
+        voice=voice,  # alloy, echo, fable, onyx, nova, shimmer
+        input=text,
+    )
+    
+    audio_data = response.content
+    latency_ms = (time.time() - start) * 1000
+
+    if return_base64:
+        return {
+            "audio": base64.b64encode(audio_data).decode("utf-8"),
+            "format": "mp3",
+            "voice": voice,
+            "latency_ms": round(latency_ms, 1),
+            "size_bytes": len(audio_data),
+            "provider": "openai",
+        }
+
+    return {
+        "audio_bytes": audio_data,
+        "format": "mp3",
+        "voice": voice,
+        "latency_ms": round(latency_ms, 1),
+        "size_bytes": len(audio_data),
+        "provider": "openai",
+    }
+
+
+async def _synthesize_edge(
+    text: str,
+    voice: str = "en-US-GuyNeural",
+    speed: str = None,
+    pitch: str = None,
+    return_base64: bool = False,
+) -> dict:
+    """Edge TTS synthesis (fallback)."""
     if not EDGE_TTS_AVAILABLE:
         raise RuntimeError("edge-tts not installed. Run: pip install edge-tts")
 
-    voice = voice or settings.TTS_VOICE
     speed = speed or settings.TTS_SPEED
     pitch = pitch or settings.TTS_PITCH
 
@@ -56,6 +128,7 @@ async def synthesize_speech(
             "voice": voice,
             "latency_ms": round(latency_ms, 1),
             "size_bytes": len(audio_data),
+            "provider": "edge",
         }
 
     return {
@@ -64,6 +137,7 @@ async def synthesize_speech(
         "voice": voice,
         "latency_ms": round(latency_ms, 1),
         "size_bytes": len(audio_data),
+        "provider": "edge",
     }
 
 
@@ -77,17 +151,28 @@ async def stream_speech(
     Generator: yields audio chunks for real-time streaming.
     Target: 200-400ms chunks for low-latency lip sync.
     """
-    if not EDGE_TTS_AVAILABLE:
-        raise RuntimeError("edge-tts not installed")
-
+    provider = settings.TTS_PROVIDER.lower()
     voice = voice or settings.TTS_VOICE
-    speed = speed or settings.TTS_SPEED
-    pitch = pitch or settings.TTS_PITCH
 
-    communicate = edge_tts.Communicate(text, voice, rate=speed, pitch=pitch)
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            yield chunk["data"]
+    if provider == "openai":
+        # OpenAI doesn't support streaming TTS, so we synthesize and chunk it
+        result = await _synthesize_openai(text, voice, return_base64=False)
+        audio_data = result["audio_bytes"]
+        chunk_size = 4096  # Split into 4KB chunks
+        for i in range(0, len(audio_data), chunk_size):
+            yield audio_data[i : i + chunk_size]
+    else:
+        # Edge-tts supports native streaming
+        if not EDGE_TTS_AVAILABLE:
+            raise RuntimeError("edge-tts not installed")
+
+        speed = speed or settings.TTS_SPEED
+        pitch = pitch or settings.TTS_PITCH
+
+        communicate = edge_tts.Communicate(text, voice, rate=speed, pitch=pitch)
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                yield chunk["data"]
 
 
 async def stream_speech_for_sentences(
@@ -175,4 +260,9 @@ def get_voice_categories() -> dict:
 
 
 def is_available() -> bool:
-    return EDGE_TTS_AVAILABLE
+    """Check if TTS is available based on configured provider."""
+    provider = settings.TTS_PROVIDER.lower()
+    if provider == "openai":
+        return OPENAI_TTS_AVAILABLE
+    else:
+        return EDGE_TTS_AVAILABLE

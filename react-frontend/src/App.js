@@ -10,6 +10,8 @@ import { chatAPI, ChatWebSocket, TTSWebSocket, healthAPI } from './services/api'
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
 import SettingsPage from './pages/SettingsPage';
+import DebugAuthPage from './pages/DebugAuthPage';
+import TokenDiagnosisPage from './pages/TokenDiagnosisPage';
 
 // Styled Components
 const Container = styled.div`
@@ -1436,6 +1438,12 @@ function AuthButtons({ onNavigate }) {
   if (isAuthenticated) {
     return (
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <CTAButton onClick={() => onNavigate('token-diagnosis')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#8B5A3C', fontSize: '12px' }}>
+          🔐 Token
+        </CTAButton>
+        <CTAButton onClick={() => onNavigate('debug')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#666', fontSize: '12px' }}>
+          🔍 Debug
+        </CTAButton>
         <CTAButton onClick={() => onNavigate('settings')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Settings size={16} /> Settings
         </CTAButton>
@@ -1715,6 +1723,16 @@ function App() {
   // ── Render Settings Page ──
   if (currentPage === 'settings') {
     return <SettingsPage onNavigate={navigate} />;
+  }
+
+  // ── Render Debug Page ──
+  if (currentPage === 'debug') {
+    return <DebugAuthPage />;
+  }
+
+  // ── Render Token Diagnosis Page ──
+  if (currentPage === 'token-diagnosis') {
+    return <TokenDiagnosisPage />;
   }
 
   const features = [

@@ -3,10 +3,10 @@ FastAPI integration with auth-service (Node.js microservice)
 This module handles JWT validation and proxying auth calls from Python to Node.
 """
 import os
+from typing import Optional
 import httpx
 import jwt
-from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, Header, status
+from fastapi import HTTPException, Header, status
 
 AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://localhost:4000")
 JWT_SECRET = os.getenv("JWT_SECRET", "athena_jwt_secret_key_change_in_prod_2026")
@@ -57,7 +57,7 @@ async def get_current_user(authorization: str = Header(None)):
         )
 
 
-async def proxy_auth_request(method: str, endpoint: str, data: dict = None, headers: dict = None) -> dict:
+async def proxy_auth_request(method: str, endpoint: str, data: Optional[dict] = None, headers: Optional[dict] = None) -> dict:
     """Proxy request to auth-service"""
     async with httpx.AsyncClient() as client:
         url = f"{AUTH_SERVICE_URL}{endpoint}"
