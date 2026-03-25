@@ -12,6 +12,8 @@ import DashboardPage from './pages/DashboardPage';
 import SettingsPage from './pages/SettingsPage';
 import DebugAuthPage from './pages/DebugAuthPage';
 import TokenDiagnosisPage from './pages/TokenDiagnosisPage';
+import HomePageModern from './pages/HomePageModern';
+import TechnologyPage from './pages/TechnologyPage';
 
 // Styled Components
 const Container = styled.div`
@@ -1733,6 +1735,16 @@ function App() {
   // ── Render Token Diagnosis Page ──
   if (currentPage === 'token-diagnosis') {
     return <TokenDiagnosisPage />;
+  }
+
+  // ── Render New Home Page ──
+  if (currentPage === 'home') {
+    return <HomePageModern onNavigate={navigate} onLaunchDemo={() => navigate('auth')} />;
+  }
+
+  // ── Render Technology Page ──
+  if (currentPage === 'technology') {
+    return <TechnologyPage onNavigate={navigate} onLaunchDemo={() => navigate('auth')} />;
   }
 
   const features = [

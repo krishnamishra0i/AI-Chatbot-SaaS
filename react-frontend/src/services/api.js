@@ -1,8 +1,13 @@
 // API service layer for Athena AI backend
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 const WS_BASE_URL = API_BASE_URL.replace('http', 'ws');
+const ALTERNATE_API_BASE_URL = API_BASE_URL.includes(':5000')
+  ? API_BASE_URL.replace(':5000', ':5001')
+  : API_BASE_URL.includes(':5001')
+  ? API_BASE_URL.replace(':5001', ':5000')
+  : null;
 
 // Create axios instance with auth interceptor
 const api = axios.create({
@@ -10,9 +15,50 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+const buildAuthHeaders = () => {
+  const token = localStorage.getItem('athena_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const requestWithPortFallback = async ({ method, url, data, config = {} }) => {
+  try {
+    return await api.request({ method, url, data, ...config });
+  } catch (error) {
+    const isNetworkOrCors = !error.response || error.type === 'CORS_ERROR';
+    if (!isNetworkOrCors || !ALTERNATE_API_BASE_URL) {
+      throw error;
+    }
+
+    console.warn('[API] Retrying request with alternate backend:', {
+      primary: API_BASE_URL,
+      fallback: ALTERNATE_API_BASE_URL,
+      url,
+      method,
+    });
+
+    return axios.request({
+      baseURL: ALTERNATE_API_BASE_URL,
+      method,
+      url,
+      data,
+      ...config,
+      headers: {
+        'Content-Type': 'application/json',
+        ...buildAuthHeaders(),
+        ...(config.headers || {}),
+      },
+    });
+  }
+};
+
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('athena_token');
+  const isPublicAuthRoute =
+    config.url?.includes('/api/auth/otp/send') ||
+    config.url?.includes('/api/auth/otp/verify') ||
+    config.url?.includes('/api/auth/send-otp') ||
+    config.url?.includes('/api/auth/verify-otp');
   
   // DEBUG: Log token attachment
   console.log('[API] Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
@@ -27,7 +73,9 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
     console.log('[API] Authorization header set:', `Bearer ${token.substring(0, 20)}...`);
   } else {
-    console.warn('[API] ⚠️ NO TOKEN FOUND - Request will be sent without Authorization header');
+    if (!isPublicAuthRoute) {
+      console.warn('[API] ⚠️ NO TOKEN FOUND - Request will be sent without Authorization header');
+    }
   }
   
   return config;
@@ -51,6 +99,21 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Handle CORS errors
+    if (!error.response) {
+      console.error('[API] ❌ Network/CORS Error:', {
+        message: error.message,
+        code: error.code,
+        url: error.config?.url,
+        hint: 'Check backend CORS config allows your frontend origin'
+      });
+      return Promise.reject({
+        type: 'CORS_ERROR',
+        message: 'Network error - Backend may have CORS restrictions',
+        original: error
+      });
+    }
+
     if (error.response?.status === 401) {
       console.error('[API] 401 Unauthorized - Clearing auth and logging out');
       console.error('[API] Response:', error.response?.data);
@@ -58,6 +121,11 @@ api.interceptors.response.use(
       localStorage.removeItem('athena_user');
       window.dispatchEvent(new Event('auth:logout'));
     }
+    
+    if (error.response?.status === 400) {
+      console.warn('[API] 400 Bad Request:', error.response?.data);
+    }
+
     return Promise.reject(error);
   }
 );
@@ -68,66 +136,76 @@ api.interceptors.response.use(
 export const authAPI = {
   // Step 1: Send OTP to email
   sendOtp: (email) =>
-    api.post('/api/auth/otp/send', { email }),
+    requestWithPortFallback({ method: 'post', url: '/api/auth/otp/send', data: { email } }),
 
   // Step 2: Verify OTP and login
   verifyOtp: (email, otp_code) =>
-    api.post('/api/auth/otp/verify', { email, otp_code }),
+    requestWithPortFallback({ method: 'post', url: '/api/auth/otp/verify', data: { email, otp_code } }),
 
   // Aliases for compatibility
   sendLoginOTP: (email) =>
-    api.post('/api/auth/otp/send', { email }),
+    requestWithPortFallback({ method: 'post', url: '/api/auth/otp/send', data: { email } }),
 
   verifyLoginOTP: (email, otp) =>
-    api.post('/api/auth/otp/verify', { email, otp_code: otp }),
+    requestWithPortFallback({ method: 'post', url: '/api/auth/otp/verify', data: { email, otp_code: otp } }),
 
   resendOTP: (email) =>
-    api.post('/api/auth/otp/send', { email }),
+    requestWithPortFallback({ method: 'post', url: '/api/auth/otp/send', data: { email } }),
 
-  getMe: () => api.get('/api/auth/otp/me'),
+  getMe: () => requestWithPortFallback({ method: 'get', url: '/api/auth/otp/me' }),
 
-  updateMe: (data) => api.patch('/api/auth/me', data),
+  updateMe: (data) => requestWithPortFallback({ method: 'patch', url: '/api/auth/me', data }),
 };
 
 // ── Chat ───────────────────────────────────────────────
 
 export const chatAPI = {
   send: (message, options = {}) =>
-    api.post('/api/chat', { message, ...options }),
+    requestWithPortFallback({ method: 'post', url: '/api/chat', data: { message, ...options } }),
 
   sendStream: (message, options = {}) =>
-    api.post('/api/chat', { message, stream: true, ...options }, {
-      responseType: 'text',
-      headers: { Accept: 'text/event-stream' },
+    requestWithPortFallback({
+      method: 'post',
+      url: '/api/chat',
+      data: { message, stream: true, ...options },
+      config: {
+        responseType: 'text',
+        headers: { Accept: 'text/event-stream' },
+      },
     }),
 
   // Dedicated streaming endpoint (sentence-level chunks for TTS)
   streamSentences: (message, options = {}) =>
-    api.post('/api/chat/stream', { message, ...options }, {
-      responseType: 'text',
-      headers: { Accept: 'text/event-stream' },
+    requestWithPortFallback({
+      method: 'post',
+      url: '/api/chat/stream',
+      data: { message, ...options },
+      config: {
+        responseType: 'text',
+        headers: { Accept: 'text/event-stream' },
+      },
     }),
 
   completions: (messages, model = 'groq/llama-3.3-70b-versatile') =>
-    api.post('/v1/chat/completions', { messages, model }),
+    requestWithPortFallback({ method: 'post', url: '/v1/chat/completions', data: { messages, model } }),
 };
 
 // ── Chatbots ───────────────────────────────────────────
 
 export const chatbotsAPI = {
-  list: () => api.get('/api/chatbots/'),
-  create: (data) => api.post('/api/chatbots/', data),
-  get: (id) => api.get(`/api/chatbots/${id}`),
-  update: (id, data) => api.patch(`/api/chatbots/${id}`, data),
-  delete: (id) => api.delete(`/api/chatbots/${id}`),
+  list: () => requestWithPortFallback({ method: 'get', url: '/api/chatbots/' }),
+  create: (data) => requestWithPortFallback({ method: 'post', url: '/api/chatbots/', data }),
+  get: (id) => requestWithPortFallback({ method: 'get', url: `/api/chatbots/${id}` }),
+  update: (id, data) => requestWithPortFallback({ method: 'patch', url: `/api/chatbots/${id}`, data }),
+  delete: (id) => requestWithPortFallback({ method: 'delete', url: `/api/chatbots/${id}` }),
 };
 
 // ── API Keys ───────────────────────────────────────────
 
 export const apiKeysAPI = {
-  list: () => api.get('/api/keys/'),
-  create: (name = 'Default Key') => api.post('/api/keys/', { name }),
-  revoke: (id) => api.delete(`/api/keys/${id}`),
+  list: () => requestWithPortFallback({ method: 'get', url: '/api/keys/' }),
+  create: (name = 'Default Key') => requestWithPortFallback({ method: 'post', url: '/api/keys/', data: { name } }),
+  revoke: (id) => requestWithPortFallback({ method: 'delete', url: `/api/keys/${id}` }),
 };
 
 // ── TTS ────────────────────────────────────────────────
@@ -135,19 +213,29 @@ export const apiKeysAPI = {
 export const ttsAPI = {
   // Real-time streaming TTS (preferred)
   synthesize: (text, voice = 'nova', speed = 1.0, pitch = 0) =>
-    api.post('/api/tts/realtime/stream', { text, voice, speed }, { responseType: 'blob' }),
+    requestWithPortFallback({
+      method: 'post',
+      url: '/api/tts/realtime/stream',
+      data: { text, voice, speed },
+      config: { responseType: 'blob' },
+    }),
 
   // Base64 variant for pre-buffering
   synthesizeBase64: (text, voice = 'nova', speed = 1.0, pitch = 0) =>
-    api.post('/api/tts/realtime/base64', { text, voice, speed }),
+    requestWithPortFallback({ method: 'post', url: '/api/tts/realtime/base64', data: { text, voice, speed } }),
 
-  voices: (locale = 'en') => api.get(`/api/tts/voices?locale=${locale}`),
+  voices: (locale = 'en') => requestWithPortFallback({ method: 'get', url: `/api/tts/voices?locale=${locale}` }),
 
-  voiceCategories: () => api.get('/api/tts/voices/categories'),
+  voiceCategories: () => requestWithPortFallback({ method: 'get', url: '/api/tts/voices/categories' }),
 
   // Deprecated: use synthesize() instead
   stream: (text, voice, speed, pitch) =>
-    api.post('/api/tts/realtime/stream', { text, voice, speed, pitch }, { responseType: 'blob' }),
+    requestWithPortFallback({
+      method: 'post',
+      url: '/api/tts/realtime/stream',
+      data: { text, voice, speed, pitch },
+      config: { responseType: 'blob' },
+    }),
 };
 
 // ── STT ────────────────────────────────────────────────
@@ -157,13 +245,16 @@ export const sttAPI = {
     const formData = new FormData();
     const isWebm = audioBlob?.type?.includes('webm');
     formData.append('file', audioBlob, isWebm ? 'recording.webm' : 'recording.wav');
-    return api.post('/api/stt', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return requestWithPortFallback({
+      method: 'post',
+      url: '/api/stt',
+      data: formData,
+      config: { headers: { 'Content-Type': 'multipart/form-data' } },
     });
   },
 
   transcribeBase64: (audioBase64) =>
-    api.post('/api/stt/base64', { audio: audioBase64 }),
+    requestWithPortFallback({ method: 'post', url: '/api/stt/base64', data: { audio: audioBase64 } }),
 };
 
 // ── Avatar ─────────────────────────────────────────────
@@ -178,16 +269,16 @@ export const avatarAPI = {
 // ── Usage ──────────────────────────────────────────────
 
 export const usageAPI = {
-  summary: (days = 30) => api.get(`/api/usage/summary?days=${days}`),
-  breakdown: (days = 30) => api.get(`/api/usage/breakdown?days=${days}`),
+  summary: (days = 30) => requestWithPortFallback({ method: 'get', url: `/api/usage/summary?days=${days}` }),
+  breakdown: (days = 30) => requestWithPortFallback({ method: 'get', url: `/api/usage/breakdown?days=${days}` }),
 };
 
 // ── Models ─────────────────────────────────────────────
 
 export const modelsAPI = {
-  list: () => api.get('/v1/models'),
-  providers: () => api.get('/api/providers'),
-  prompts: () => api.get('/api/prompts'),
+  list: () => requestWithPortFallback({ method: 'get', url: '/v1/models' }),
+  providers: () => requestWithPortFallback({ method: 'get', url: '/api/providers' }),
+  prompts: () => requestWithPortFallback({ method: 'get', url: '/api/prompts' }),
 };
 
 // -- Memory --
