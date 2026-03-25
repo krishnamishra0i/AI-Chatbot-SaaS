@@ -3,7 +3,7 @@ FastAPI integration with auth-service (Node.js microservice)
 This module handles JWT validation and proxying auth calls from Python to Node.
 """
 import os
-from typing import Optional
+from typing import Optional, Dict, Any
 import httpx
 import jwt
 from fastapi import HTTPException, Header, status
@@ -12,8 +12,12 @@ AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://localhost:4000")
 JWT_SECRET = os.getenv("JWT_SECRET", "athena_jwt_secret_key_change_in_prod_2026")
 JWT_ALGORITHM = "HS256"
 
+#Reuse client (Important for async performance)
+auth_client = httpx.AsyncClient(timeout=10)
 
-async def get_current_user(authorization: str = Header(None)):
+
+# jwt validation middleware
+async def get_current_user(authorization: Optional[str] = Header(default= None)) -> Dict[str, Any]:
     """JWT validation middleware - extracts and validates Bearer token"""
     if not authorization:
         raise HTTPException(
@@ -22,12 +26,22 @@ async def get_current_user(authorization: str = Header(None)):
         )
     
     try:
-        scheme, token = authorization.split()
+        parts = authorization.split()
+        if len(parts) != 2:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Malformed authorization header"
+            )
+        scheme, token = parts
+            
+        # scheme, token = authorization.split()
         if scheme.lower() != "bearer":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authorization scheme"
             )
+        
+        #Decoding Jwt token
         
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("sub")
@@ -40,6 +54,7 @@ async def get_current_user(authorization: str = Header(None)):
             )
         
         return {"user_id": user_id, "email": email}
+    
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -56,9 +71,11 @@ async def get_current_user(authorization: str = Header(None)):
             detail="Malformed authorization header"
         )
 
-
-async def proxy_auth_request(method: str, endpoint: str, data: Optional[dict] = None, headers: Optional[dict] = None) -> dict:
+#auth services proxy function
+async def proxy_auth_request(
+        method: str, endpoint: str, data: Optional[dict] = None, headers: Optional[dict] = None) -> dict:
     """Proxy request to auth-service"""
+
     async with httpx.AsyncClient() as client:
         url = f"{AUTH_SERVICE_URL}{endpoint}"
         req_headers = headers or {}
@@ -68,12 +85,20 @@ async def proxy_auth_request(method: str, endpoint: str, data: Optional[dict] = 
             else:
                 response = await client.get(url, timeout=10, headers=req_headers)
             
+            # safe json parsing
+            try:
+                response_data = response.json()
+            except Exception:
+                response_data = {"error": response.text}
+                
             if response.status_code >= 400:
                 raise HTTPException(
                     status_code=response.status_code,
-                    detail=response.json().get("error", "Auth service error")
+                    detail=response_data.get("error", "Auth service error"),
                 )
-            return response.json()
+            # return response.json()
+            return response_data
+        
         except httpx.RequestError as e:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

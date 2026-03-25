@@ -41,9 +41,9 @@ def _get_openai_client():
 
 async def synthesize_speech(
     text: str,
-    voice: str = None,
-    speed: str = None,
-    pitch: str = None,
+    voice: Optional[str] = None,
+    speed: Optional[str] = None,
+    pitch: Optional[str] = None,
     return_base64: bool = False,
 ) -> dict:
     """
@@ -61,7 +61,7 @@ async def synthesize_speech(
 
 async def _synthesize_openai(
     text: str,
-    voice: str = "alloy",
+    voice: Optional[str] = "alloy",
     return_base64: bool = False,
 ) -> dict:
     """OpenAI TTS synthesis."""
@@ -100,8 +100,8 @@ async def _synthesize_openai(
 async def _synthesize_edge(
     text: str,
     voice: str = "en-US-GuyNeural",
-    speed: str = None,
-    pitch: str = None,
+    speed: Optional[str] = None,
+    pitch: Optional[str] = None,
     return_base64: bool = False,
 ) -> dict:
     """Edge TTS synthesis (fallback)."""
@@ -171,7 +171,7 @@ async def stream_speech(
 
         communicate = edge_tts.Communicate(text, voice, rate=speed, pitch=pitch)
         async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
+            if chunk["type"] == "audio" and "data" in chunk:
                 yield chunk["data"]
 
 
@@ -196,7 +196,7 @@ async def stream_speech_for_sentences(
 
         communicate = edge_tts.Communicate(sentence, voice, rate=speed)
         async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
+            if chunk["type"] == "audio" and "data" in chunk:
                 audio_data += chunk["data"]
                 # Yield partial audio for truly low-latency playback
                 if len(audio_data) > 4096:
