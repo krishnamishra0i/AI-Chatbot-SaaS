@@ -3,7 +3,6 @@ Application configuration using Pydantic Settings.
 Reads from environment variables and .env file.
 """
 
-import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import Optional
@@ -21,7 +20,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 5000
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3005,http://localhost:5173,http://localhost:5174"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3005,http://localhost:5173,http://localhost:5174"
 
     # ── Security ─────────────────────────────────────
     SECRET_KEY: str = "dev-secret-key-change-in-production"

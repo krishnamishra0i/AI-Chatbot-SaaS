@@ -5,6 +5,7 @@ STT routes — speech-to-text transcription with subscription limits.
 from fastapi import APIRouter, HTTPException, UploadFile, File, Header
 from pydantic import BaseModel
 from typing import Optional
+from pathlib import Path
 
 from api.schemas.schemas import STTResponse
 from api.services import stt_service
@@ -78,7 +79,20 @@ async def speech_to_text(
     # ════════════════════════════════════════════════════════════════════
     # STEP 6: TRANSCRIBE AUDIO
     # ════════════════════════════════════════════════════════════════════
-    result = await stt_service.transcribe_audio(audio_bytes=audio_bytes)
+    suffix = Path(file.filename or "").suffix.lower() if file.filename else ""
+    if not suffix:
+        # Handle browser recorder uploads that may omit filename extension
+        content_type = (file.content_type or "").lower()
+        if "webm" in content_type:
+            suffix = ".webm"
+        elif "ogg" in content_type:
+            suffix = ".ogg"
+        elif "mpeg" in content_type or "mp3" in content_type:
+            suffix = ".mp3"
+        elif "wav" in content_type:
+            suffix = ".wav"
+
+    result = await stt_service.transcribe_audio(audio_bytes=audio_bytes, file_suffix=suffix or ".webm")
     
     # ════════════════════════════════════════════════════════════════════
     # STEP 7: TRACK STT USAGE
@@ -158,7 +172,8 @@ async def stt_upload(
     if not can_stt:
         raise HTTPException(status_code=429, detail=reason)
     
-    result = await stt_service.transcribe_audio(audio_bytes=audio_bytes)
+    suffix = Path(audio.filename or "").suffix.lower() if audio.filename else ".webm"
+    result = await stt_service.transcribe_audio(audio_bytes=audio_bytes, file_suffix=suffix or ".webm")
     
     # Track usage
     subscription_manager.add_stt_usage(final_user_id, estimated_seconds)

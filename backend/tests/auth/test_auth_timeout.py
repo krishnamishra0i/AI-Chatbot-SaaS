@@ -27,7 +27,7 @@ for attempt in range(1, 4):
         
         if resp.status_code == 201:
             data = resp.json()
-            print(f"✅ Success!")
+            print("✅ Success!")
             print(f"Token: {data.get('access_token', '')[:40]}...")
             break
         elif attempt < 3:

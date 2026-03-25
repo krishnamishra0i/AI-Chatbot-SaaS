@@ -1,7 +1,43 @@
 """
 Auth dependency — extracts and validates JWT bearer token.
 Supports both backend-generated JWTs and auth-service JWTs.
+
+WHICH DEPENDENCY TO USE IN YOUR ROUTES:
+======================================
+
+1. **For protected endpoints that need User object:**
+   Use: `get_current_user_from_auth_service`
+   
+   @router.get("/me")
+   async def get_me(user: User = Depends(get_current_user_from_auth_service)):
+       return user
+
+2. **For endpoints that work without database lookup:**
+   Use: `get_current_user_from_jwt_header`
+   
+   @router.post("/validate")
+   async def validate_token(payload: dict = Depends(get_current_user_from_jwt_header)):
+       return payload
+
+3. **For endpoints where auth is optional:**
+   Use: `get_optional_user`
+   
+   @router.get("/public")
+   async def get_public(user: Optional[User] = Depends(get_optional_user)):
+       return {"user": user}
+
+DEPRECATED:
+- `get_current_user` - Use `get_current_user_from_auth_service` instead
+- `get_current_user_jwt_from_header` - Use `get_current_user_from_jwt_header` instead
+
+JWT FLOW:
+=========
+1. Frontend sends Authorization: Bearer <JWT>
+2. Backend validates JWT signature using settings.JWT_SECRET
+3. User is looked up in database by ID or oauth_id
+4. If not found and from external provider, auto-create user
 """
+
 
 from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -63,7 +99,7 @@ async def get_current_user_jwt_from_header(
                 'email': payload.get('email'),
                 'source': 'backend'
             }
-    except Exception as e:
+    except Exception:
         return None
 
 
@@ -72,52 +108,43 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """
-    Dependency: returns the authenticated User or raises 401.
-    Tries multiple auth methods:
-    1. Backend JWT from HTTPBearer
-    2. Auth-service JWT from Authorization header
-    3. Database user lookup
+    DEPRECATED: Use get_current_user_from_auth_service instead.
+    This function has been kept for backward compatibility only.
     """
-    user_id = None
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing credentials"
+        )
     
-    # Method 1: Try HTTPBearer (old system)
-    if credentials:
-        try:
-            payload = decode_access_token(credentials.credentials)
-            user_id = payload.get("sub")
-        except Exception:
-            pass
-    
-    # Method 2: Try auth-service JWT format
-    if not user_id:
-        try:
-            # Get token from credentials or re-use from request context
+    try:
+        payload = decode_access_token(credentials.credentials)
+        user_id = payload.get("sub")
+        
+        if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not authenticated"
+                detail="Invalid token: missing user ID"
             )
-        except HTTPException:
-            raise
-        except Exception:
-            pass
-    
-    if not user_id:
+        
+        # Look up user in database
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        
+        if user is None or not user.is_active:  # type: ignore[union-attr]
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found or inactive"
+            )
+        
+        return user
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated"
+            detail="Token verification failed"
         )
-    
-    # Look up user in database
-    result = await db.execute(select(User).where(User.id == user_id))
-    user = result.scalar_one_or_none()
-    
-    if user is None or not user.is_active:  # type: ignore[union-attr]
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive"
-        )
-    
-    return user
 
 
 async def get_current_user_from_jwt_header(
@@ -192,9 +219,15 @@ async def ensure_user_exists(
     """
     Ensure a User record exists for the given oauth_id.
     Creates one if it doesn't exist.
-    Supports multiple auth providers: auth-service, otp-mongodb, etc.
+    Supports multiple auth providers: auth-service, otp-mongodb, google, github, etc.
+    
+    Returns existing or newly created User.
+    Raises HTTPException if user cannot be created.
     """
-    # Look up by oauth_id + provider
+    if not user_id:
+        raise ValueError("user_id cannot be empty")
+    
+    # ─── Look up by oauth_id + provider ───
     result = await db.execute(
         select(User).where(
             (User.oauth_id == user_id) & (User.oauth_provider == provider)
@@ -205,7 +238,7 @@ async def ensure_user_exists(
     if user:
         return user
     
-    # If email is provided, check if user exists with that email (from another auth provider)
+    # ─── Check if email already exists (link new provider to existing account) ───
     if email:
         result = await db.execute(
             select(User).where(User.email == email)
@@ -213,15 +246,15 @@ async def ensure_user_exists(
         existing_user = result.scalar_one_or_none()
         
         if existing_user:
-            # Update the oauth credentials for this provider
+            # Link this new oauth provider to existing account
             existing_user.oauth_id = user_id  # type: ignore[assignment]
             existing_user.oauth_provider = provider  # type: ignore[assignment]
             await db.flush()
             await db.refresh(existing_user)
-            print(f"[UPDATE] User oauth credentials updated: email={email}, new_oauth_id={user_id}, provider={provider}")
+            print(f"[AUTH] Linked provider - email={email}, oauth_provider={provider}")
             return existing_user
     
-    # Create new user
+    # ─── Create new user ───
     import uuid
     
     new_user = User(
@@ -232,10 +265,15 @@ async def ensure_user_exists(
         is_active=True,
     )
     db.add(new_user)
-    await db.flush()
-    await db.refresh(new_user)
-    print(f"[CREATE] New user created: id={new_user.id}, oauth_id={user_id}, provider={provider}, email={email}")
-    return new_user
+    
+    try:
+        await db.flush()
+        await db.refresh(new_user)
+        print(f"[AUTH] User created - id={new_user.id}, email={new_user.email}, provider={provider}")
+        return new_user
+    except Exception as e:
+        await db.rollback()
+        raise ValueError(f"Failed to create user: {str(e)}")
 
 
 async def get_current_user_from_auth_service(
@@ -243,19 +281,22 @@ async def get_current_user_from_auth_service(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """
-    Get User from JWT in Authorization header. (backend auth, auth-service, or OTP)
+    PRIMARY AUTH DEPENDENCY - Get User from JWT in Authorization header.
+    
     Supports:
     1. Auth-service JWTs (with oauth_id in 'sub')
     2. Backend local auth JWTs (with user.id in 'sub')
     3. OTP system JWTs (with mongodb user_id in 'sub', email in payload)
     
     Returns the User object. Auto-creates user if from OTP/auth-service.
-    """
-    print("\n[TRACE] get_current_user_from_auth_service called")
-    print(f"[TRACE] authorization header: {authorization[:30] if authorization else 'NONE'}...")
     
+    Raises:
+    - 401 if token is missing, invalid, or expired
+    - 401 if user not found and cannot be auto-created
+    """
+    
+    # ─── STEP 1: Validate Authorization Header ───
     if not authorization:
-        print("[TRACE] No authorization header")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing Authorization header"
@@ -264,61 +305,18 @@ async def get_current_user_from_auth_service(
     if not authorization.startswith('Bearer '):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Authorization header format"
+            detail="Invalid Authorization format. Use: Bearer <token>"
         )
     
     token = authorization.split(' ', 1)[1]
     
+    # ─── STEP 2: Decode JWT ───
     try:
-        # Decode with JWT_SECRET (works for OTP, auth-service, and backend JWTs)
         payload = jwt.decode(
             token,
             settings.JWT_SECRET,
             algorithms=['HS256']
         )
-        
-        user_id = payload.get('sub')
-        email = payload.get('email')
-        
-        print(f"[TRACE] Token decoded - sub: {user_id}, email: {email}")
-        
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: missing user ID"
-            )
-        
-        # Try to find user by id first (backend local auth)
-        result = await db.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        
-        if user:
-            print(f"[TRACE] Found user by id: {user.id}")
-            return user
-        
-        # Try to find user by oauth_id (auth-service)
-        result = await db.execute(
-            select(User).where(
-                (User.oauth_id == user_id) & (User.oauth_provider == "auth-service")
-            )
-        )
-        user = result.scalar_one_or_none()
-        
-        if user:
-            print(f"[TRACE] Found user by oauth_id: {user.id}")
-            return user
-        
-        # Auto-create user if coming from auth-service or OTP
-        # Detect if it's an OTP user (mongodb ObjectId format) or auth-service
-        provider = "auth-service"
-        if len(str(user_id)) == 24:  # MongoDB ObjectId is 24 chars
-            provider = "otp-mongodb"
-        
-        print(f"[TRACE] Auto-creating user for provider: {provider}")
-        user = await ensure_user_exists(db, user_id, email, provider)
-        print(f"[TRACE] User auto-created: {user.id}")
-        return user
-        
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -329,16 +327,64 @@ async def get_current_user_from_auth_service(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {str(e)}"
         )
-    except HTTPException:
-        raise
     except Exception as e:
-        import traceback
-        error_msg = f"{str(e)}\n{traceback.format_exc()}"
-        print("[ERROR] get_current_user_from_auth_service failed:")
-        print(f"[ERROR] {error_msg}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token verification failed: {str(e)}"
+        )
+    
+    # ─── STEP 3: Extract User ID from Token ───
+    user_id = payload.get('sub')
+    email = payload.get('email')
+    
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token: missing user ID (sub claim)"
+        )
+    
+    # ─── STEP 4: Find User in Database ───
+    
+    # Try Method A: Find by primary ID (backend local auth)
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    
+    if user and user.is_active:  # type: ignore[union-attr]
+        return user
+    elif user and not user.is_active:  # type: ignore[union-attr]
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is inactive"
+        )
+    
+    # Try Method B: Find by oauth_id (auth-service/external)
+    result = await db.execute(
+        select(User).where(
+            (User.oauth_id == user_id) & (User.oauth_provider.in_(["auth-service", "otp-mongodb", "google", "github"]))
+        )
+    )
+    user = result.scalar_one_or_none()
+    
+    if user and user.is_active:  # type: ignore[union-attr]
+        return user
+    elif user and not user.is_active:  # type: ignore[union-attr]
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is inactive"
+        )
+    
+    # ─── STEP 5: Auto-create User if from External Provider ───
+    try:
+        provider = "auth-service"
+        if len(str(user_id)) == 24:  # MongoDB ObjectId is 24 chars
+            provider = "otp-mongodb"
+        
+        user = await ensure_user_exists(db, user_id, email, provider)
+        return user
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Could not create user: {str(e)}"
         )
 
 
