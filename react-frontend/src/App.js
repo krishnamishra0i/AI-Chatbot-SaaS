@@ -14,6 +14,9 @@ import DebugAuthPage from './pages/DebugAuthPage';
 import TokenDiagnosisPage from './pages/TokenDiagnosisPage';
 import HomePageModern from './pages/HomePageModern';
 import TechnologyPage from './pages/TechnologyPage';
+import PersonaAIPage from './pages/PersonaAIPage';
+import LoginPage from './pages/LoginPage';
+import VerificationPage from './pages/VerificationPage';
 
 // Styled Components
 const Container = styled.div`
@@ -1459,7 +1462,7 @@ function AuthButtons({ onNavigate }) {
   
   return (
     <div style={{ display: 'flex', gap: '10px' }}>
-      <CTAButton onClick={() => onNavigate('auth')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <CTAButton onClick={() => onNavigate('login')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         <LogIn size={16} /> Sign In
       </CTAButton>
     </div>
@@ -1467,7 +1470,7 @@ function AuthButtons({ onNavigate }) {
 }
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState('login');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
     { type: 'bot', text: 'Hello! I\'m Athena, your AI assistant. How can I help you today?' }
@@ -1712,11 +1715,6 @@ function App() {
     window.scrollTo(0, 0);
   };
 
-  // ── Render Auth Page ──
-  if (currentPage === 'auth') {
-    return <AuthPage onNavigate={navigate} />;
-  }
-
   // ── Render Dashboard ──
   if (currentPage === 'dashboard') {
     return <DashboardPage onNavigate={navigate} />;
@@ -1739,12 +1737,27 @@ function App() {
 
   // ── Render New Home Page ──
   if (currentPage === 'home') {
-    return <HomePageModern onNavigate={navigate} onLaunchDemo={() => navigate('auth')} />;
+    return <HomePageModern onNavigate={navigate} onLaunchDemo={() => navigate('login')} />;
   }
 
   // ── Render Technology Page ──
   if (currentPage === 'technology') {
-    return <TechnologyPage onNavigate={navigate} onLaunchDemo={() => navigate('auth')} />;
+    return <TechnologyPage onNavigate={navigate} onLaunchDemo={() => navigate('login')} />;
+  }
+
+  // ── Render PersonaAI Page ──
+  if (currentPage === 'persona-ai') {
+    return <PersonaAIPage onNavigate={navigate} onLaunchDemo={() => navigate('login')} />;
+  }
+
+  // ── Render Login Page ──
+  if (currentPage === 'login') {
+    return <LoginPage onNavigate={navigate} />;
+  }
+
+  // ── Render Verification Page ──
+  if (currentPage === 'verification') {
+    return <VerificationPage onNavigate={navigate} />;
   }
 
   const features = [
@@ -2062,8 +2075,8 @@ function App() {
         <CTASection>
           <CTATitle>Start Building Real-Time AI Avatars Today</CTATitle>
           <CTADescription>Join thousands of enterprise customers using Athena for real-time AI interactions</CTADescription>
-          <CTASectionButton onClick={openChatbot}>Launch Demo</CTASectionButton>
-          <CTASectionButton onClick={() => navigate('auth')} style={{ marginLeft: '16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: 'none', animation: 'none' }}>
+          <CTASectionButton onClick={() => navigate('login')}>Launch Demo</CTASectionButton>
+          <CTASectionButton onClick={() => navigate('login')} style={{ marginLeft: '16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: 'none', animation: 'none' }}>
             Get Started Free
           </CTASectionButton>
         </CTASection>

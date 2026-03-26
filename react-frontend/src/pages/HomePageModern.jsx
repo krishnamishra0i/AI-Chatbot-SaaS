@@ -78,7 +78,7 @@ export default function HomePageModern({ onNavigate, onLaunchDemo }) {
             <div className="z-10 space-y-8">
               <span className="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest font-label">The Future of Interaction</span>
               <h2 className="text-6xl md:text-7xl font-headline font-extrabold text-on-surface leading-[1.1] tracking-tight">
-                Real-Time <span className="text-primary italic">AI Avatar</span> Conversations
+                Real-Time <span className="text-primary italic">Avatar ChatbotAI</span> Conversations
               </h2>
               <p className="text-xl text-on-surface-variant max-w-xl leading-relaxed">
                 Deploy photorealistic digital humans integrated with Unreal Engine 5. Experience human-like responsiveness with sub-120ms latency.
