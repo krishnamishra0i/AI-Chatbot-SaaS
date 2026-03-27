@@ -1,7 +1,7 @@
 @echo off
-REM Start Athena backend with TTS/STT support (no auto-reload)
+REM Start Athena FastAPI backend (stable mode, no auto-reload)
 cd /d "%~dp0"
-echo Starting Athena Flask Backend (TTS/STT enabled)...
-echo Disabling auto-reload to prevent import issues...
-python -m flask run --no-reload
+echo Starting Athena FastAPI Backend on port 5000...
+set UVICORN_RELOAD=false
+python run.py
 pause

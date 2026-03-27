@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 from bson import ObjectId
+from pydantic import model_validator
 
 class PyObjectId(ObjectId):
     @classmethod
@@ -50,6 +51,14 @@ class SendOTPRequest(BaseModel):
 class VerifyOTPRequest(BaseModel):
     email: str = Field(..., description="User email address")
     otp_code: str = Field(..., min_length=6, max_length=6, description="6-digit OTP code")
+
+    @model_validator(mode="before")
+    @classmethod
+    def map_otp_alias(cls, data):
+        # Backward compatibility: accept both `otp_code` and `otp` payload keys.
+        if isinstance(data, dict) and "otp_code" not in data and "otp" in data:
+            data["otp_code"] = data["otp"]
+        return data
 
 
 class TokenResponse(BaseModel):
