@@ -15,8 +15,13 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+const getStoredToken = () =>
+  localStorage.getItem('athena_token') ||
+  localStorage.getItem('token') ||
+  localStorage.getItem('accessToken');
+
 const buildAuthHeaders = () => {
-  const token = localStorage.getItem('athena_token');
+  const token = getStoredToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -53,7 +58,7 @@ const requestWithPortFallback = async ({ method, url, data, config = {} }) => {
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('athena_token');
+  const token = getStoredToken();
   const isPublicAuthRoute =
     config.url?.includes('/api/auth/otp/send') ||
     config.url?.includes('/api/auth/otp/verify') ||
@@ -88,9 +93,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => {
     // Auto-store token if present in response (from OTP endpoints)
-    if (response.data && response.data.access_token) {
+    if (response.data && (response.data.access_token || response.data.token)) {
+      const authToken = response.data.access_token || response.data.token;
       console.log('[API] Token found in response - storing in localStorage');
-      localStorage.setItem('athena_token', response.data.access_token);
+      localStorage.setItem('athena_token', authToken);
+      localStorage.setItem('token', authToken);
+      localStorage.setItem('accessToken', authToken);
       if (response.data.user) {
         localStorage.setItem('athena_user', JSON.stringify(response.data.user));
         console.log('[API] ✓ Token and user stored from OTP response');

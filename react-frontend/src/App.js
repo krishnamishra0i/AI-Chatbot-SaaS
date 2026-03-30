@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Video, VideoOff, Mic, MicOff, LogIn, LayoutDashboard, Settings } from 'lucide-react';
 import axios from 'axios';
+import './styles/AITheme.css'; // Import AI Theme FIRST
 import './App.css';
 import FeatureCards from './FeatureCards';
 import { AuthProvider, useAuth } from './contexts/AuthContext';

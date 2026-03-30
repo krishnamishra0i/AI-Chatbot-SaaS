@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { authAPI } from '../services/api';
 
 const VerificationContainer = styled.div`
   min-height: 100vh;
@@ -342,9 +343,20 @@ const FooterLink = styled.a`
 `;
 
 const VerificationPage = ({ onNavigate = () => {} }) => {
-  const [otp, setOtp] = useState(['4', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(120);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const pendingEmail = localStorage.getItem('pending_auth_email') || '';
+    if (!pendingEmail) {
+      onNavigate('login');
+      return;
+    }
+    setEmail(pendingEmail);
+  }, [onNavigate]);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -363,22 +375,66 @@ const VerificationPage = ({ onNavigate = () => {} }) => {
     }
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    const otpCode = otp.join('');
+    setError('');
 
-    if (otpCode.length === 6) {
-      setTimeout(() => {
-        setIsLoading(false);
-        onNavigate('dashboard');
-      }, 1500);
+    const otpCode = otp.join('');
+    if (otpCode.length !== 6) {
+      setError('Enter a valid 6-digit OTP code.');
+      return;
+    }
+
+    if (!email) {
+      setError('Missing email session. Please login again.');
+      onNavigate('login');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await authAPI.verifyOtp(email, otpCode);
+      const authToken = res?.data?.access_token || res?.data?.token;
+      const userData = res?.data?.user || null;
+
+      if (authToken) {
+        localStorage.setItem('athena_token', authToken);
+        localStorage.setItem('token', authToken);
+        localStorage.setItem('accessToken', authToken);
+      }
+      if (userData) {
+        localStorage.setItem('athena_user', JSON.stringify(userData));
+      }
+
+      localStorage.removeItem('pending_auth_email');
+      onNavigate('dashboard');
+    } catch (err) {
+      const message = err?.response?.data?.detail || err?.message || 'OTP verification failed. Please try again.';
+      setError(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
+    if (!email) {
+      setError('Missing email session. Please login again.');
+      onNavigate('login');
+      return;
+    }
+
+    setError('');
+    try {
+      await authAPI.sendOtp(email);
+    } catch (err) {
+      const message = err?.response?.data?.detail || err?.message || 'Failed to resend OTP.';
+      setError(message);
+      return;
+    }
+
     setTimeLeft(120);
-    setOtp(['4', '', '', '', '', '']);
+    setOtp(['', '', '', '', '', '']);
   };
 
   const formatTime = (seconds) => {
@@ -402,7 +458,7 @@ const VerificationPage = ({ onNavigate = () => {} }) => {
               <IconCircle>🔒</IconCircle>
               <Title>Security Verification</Title>
               <Subtitle>
-                Enter the 6-digit code sent to your registered device to continue access.
+                Enter the 6-digit code sent to {email || 'your email'} to continue access.
               </Subtitle>
             </div>
 
@@ -439,6 +495,12 @@ const VerificationPage = ({ onNavigate = () => {} }) => {
                 </ResendContainer>
               </ButtonGroup>
             </OTPForm>
+
+            {error && (
+              <p style={{ margin: 0, color: '#b42318', fontSize: '14px', textAlign: 'center' }}>
+                {error}
+              </p>
+            )}
 
             <BannerBox>
               <span style={{ fontSize: '18px' }}>🛡️</span>

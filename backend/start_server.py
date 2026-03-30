@@ -7,7 +7,7 @@ import os
 # Change to backend directory
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-print("[INFO] Starting Athena FastAPI Backend on port 5000")
+print("[INFO] Starting Athena FastAPI Backend on configured port")
 print("[INFO] Auto-reload disabled for stable local runtime")
 print(f"[INFO] Running: {sys.executable} run.py\n")
 

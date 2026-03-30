@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { authAPI } from '../services/api';
 
 const Page = styled.div`
   min-height: 100vh;
@@ -293,14 +294,29 @@ const FooterRow = styled.div`
 const LoginPage = ({ onNavigate = () => {} }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleContinue = (e) => {
+  const handleContinue = async (e) => {
     e.preventDefault();
+    setError('');
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      setError('Please enter your email.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authAPI.sendOtp(normalizedEmail);
+      localStorage.setItem('pending_auth_email', normalizedEmail);
       onNavigate('verification');
-    }, 800);
+    } catch (err) {
+      const message = err?.response?.data?.detail || err?.message || 'Failed to send OTP. Please try again.';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -342,6 +358,12 @@ const LoginPage = ({ onNavigate = () => {} }) => {
               <ContinueButton type="submit" disabled={isLoading}>
                 {isLoading ? 'Continue...' : 'Continue →'}
               </ContinueButton>
+
+              {error && (
+                <p style={{ margin: 0, color: '#b42318', fontSize: '14px', textAlign: 'center' }}>
+                  {error}
+                </p>
+              )}
             </FormSection>
 
             <Divider>

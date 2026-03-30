@@ -1,0 +1,181 @@
+/* Global Tailwind CSS with AI Solutions Theme */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+/* Material Symbols */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+:root {
+  /* Custom Colors */
+  --inverse-primary: #3adfac;
+  --error: #ba1a1a;
+  --on-primary-fixed: #002116;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --on-secondary-fixed: #001e2f;
+  --on-tertiary: #ffffff;
+  --surface-container-highest: #d3e4fe;
+  --on-secondary: #ffffff;
+  --tertiary: #904d00;
+  --surface-bright: #f8f9ff;
+  --secondary-fixed-dim: #89ceff;
+  --tertiary-fixed-dim: #ffb77b;
+  --outline: #6c7a73;
+  --surface-container-high: #dce9ff;
+  --surface-variant: #d3e4fe;
+  --on-error-container: #93000a;
+  --secondary: #006591;
+  --on-error: #ffffff;
+  --tertiary-fixed: #ffdcc2;
+  --background: #f8f9ff;
+  --on-tertiary-container: #683700;
+  --on-primary-fixed-variant: #00513b;
+  --on-primary-container: #004d38;
+  --secondary-container: #39b8fd;
+  --on-background: #0b1c30;
+  --inverse-on-surface: #eaf1ff;
+  --on-primary: #ffffff;
+  --error-container: #ffdad6;
+  --surface-container: #e5eeff;
+  --outline-variant: #bacac1;
+  --secondary-fixed: #c9e6ff;
+  --tertiary-container: #ff972f;
+  --on-tertiary-fixed-variant: #6d3900;
+  --surface: #f8f9ff;
+  --on-tertiary-fixed: #2e1500;
+  --on-surface-variant: #3c4a43;
+  --on-secondary-fixed-variant: #004c6e;
+  --inverse-surface: #213145;
+  --primary-fixed: #60fcc7;
+  --primary-container: #00c897;
+  --surface-dim: #cbdbf5;
+  --on-surface: #0b1c30;
+  --primary: #006c50;
+  --surface-tint: #006c50;
+  --primary-fixed-dim: #3adfac;
+  --on-secondary-container: #004666;
+}
+
+* {
+  @apply transition-colors duration-200;
+}
+
+html {
+  @apply scroll-smooth;
+}
+
+body {
+  @apply bg-background font-body text-on-background;
+  font-family: 'Manrope', sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom Component Classes */
+.glass-card {
+  @apply bg-white/40 backdrop-blur-md border border-white/30;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+/* Utility Classes */
+.font-headline {
+  @apply font-['Plus_Jakarta_Sans'];
+}
+
+.font-body {
+  @apply font-['Manrope'];
+}
+
+.font-label {
+  @apply font-['Inter'];
+}
+
+.bg-mesh {
+  background-color: #f8f9ff;
+  background-image: radial-gradient(at 0% 0%, rgba(52, 181, 250, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(96, 252, 199, 0.15) 0px, transparent 50%);
+}
+
+.vibrant-gradient {
+  background: linear-gradient(135deg, #34b5fa 0%, #60fcc7 100%);
+}
+
+.vibrant-text-gradient {
+  background: linear-gradient(135deg, #34b5fa 0%, #60fcc7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus States */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  body {
+    @apply text-sm;
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+}
